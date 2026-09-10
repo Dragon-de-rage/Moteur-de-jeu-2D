@@ -7,16 +7,16 @@ using WorldPoint = std::pair<double, double>;
 
 ScreenPoint toScreen(const WorldPoint& point, int W, int H, double z)
 {
-    int X = W / 2 + point.first * z;
-    int Y = H / 2 - point.second * z;
+    int X = W + point.first * z;
+    int Y = point.second * z - H;
 
     return { X, Y };
 }
 
 WorldPoint toWorld(const ScreenPoint& point, int W, int H, double z)
 {
-    double X = (point.first - W / 2) / z;
-    double Y = (H / 2 - point.second) / z;
+    double X = (point.first - W) / z;
+    double Y = (H - point.second) / z;
 
     return { X, Y };
 }
