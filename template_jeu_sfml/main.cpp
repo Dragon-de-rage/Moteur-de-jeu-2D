@@ -13,6 +13,14 @@ ScreenPoint toScreen(const WorldPoint& point, int W, int H, double z)
     return { X, Y };
 }
 
+WorldPoint toWorld(const ScreenPoint& point, int W, int H, double z)
+{
+    double X = (point.first - W / 2) / z;
+    double Y = (H / 2 - point.second) / z;
+
+    return { X, Y };
+}
+
 int main()
 {
     GameWindow window;
