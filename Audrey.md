@@ -52,3 +52,9 @@ using WorldPoint = std::pair<double, double>;
 ScreenPoint toScreen(const WorldPoint &point);
 ```
 
+*(8) Inversement, proposez l’implémentation de :*
+```
+WorldPoint toPhysical(const ScreenPoint &point);
+```
+
+*(9) En mode Debug, affichez les axes x et y à l’aide de 2 traits rouges.*
