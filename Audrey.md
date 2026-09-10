@@ -44,17 +44,5 @@ Y = -H + (y * z)
 
 => y = (Y + H)/z
 
-*(7) A partir des questions précédentes, proposez l’implémentation de la fonction suivante qui convertit des coordonnées physiques en coordonnées écran :*
-```
-using ScreenPoint = std::pair<int, int>;
-using WorldPoint = std::pair<double, double>;
 
-ScreenPoint toScreen(const WorldPoint &point);
-```
-
-*(8) Inversement, proposez l’implémentation de :*
-```
-WorldPoint toPhysical(const ScreenPoint &point);
-```
-
-*(9) En mode Debug, affichez les axes x et y à l’aide de 2 traits rouges.*
+Ensuite j'ai essayé de fix les bug du code (qui étaient prévu pour une version anterieur)
