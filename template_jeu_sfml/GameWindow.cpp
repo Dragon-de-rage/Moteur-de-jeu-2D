@@ -4,6 +4,23 @@ GameWindow::GameWindow()
 {
 }
 
+ScreenPoint toScreen(const WorldPoint& point, int W, int H, double z)
+{
+    int X = W / 2 + point.first * z;
+    int Y = H / 2 + point.second * z;
+
+    return { X, Y };
+}
+
+WorldPoint toWorld(const ScreenPoint& point, int W, int H, double z)
+{
+    double X = (point.first - W / 2) / z;
+    double Y = (H / 2 - point.second) / z;
+
+    return { X, Y };
+}
+
+
 void GameWindow::show(int width, int height, const std::string& title)
 {
     _window.create(sf::VideoMode(sf::Vector2u(width, height)), title);
@@ -29,19 +46,19 @@ void GameWindow::processEvents()
         {
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
             {
-                // Left key pressed.
+				playerX -= 1.0; // Move player left
             }
             else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
             {
-                // Right key pressed.
+				playerX += 1.0; // Move player right
             }
             else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
             {
-                // Up key pressed.
+                playerY -= 1.0; // Move player up
             }
             else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
             {
-                // Down key pressed.
+                playerY += 1.0; // Move player down
             }
         }
     }
@@ -80,9 +97,22 @@ void GameWindow::render()
     // Draw player as a yellow circle.
     int radius = 10;
 
+	//zoom factor
+	double z = 10.0; // Adjust this value to change the zoom level
+
+	//player position in screen coordinates
+	WorldPoint playerPosition = { playerX, playerY };
+
+	// Convert player position to screen coordinates
+    ScreenPoint playerScreenPosition = toScreen(playerPosition, screen_res.x, screen_res.y, z);
+
+
+	//create player circle shape
     sf::CircleShape circle(radius);
+
     circle.setFillColor(sf::Color::Yellow);
-    circle.setPosition(sf::Vector2f(100 - radius, 100 - radius));
+
+    circle.setPosition(sf::Vector2f(playerScreenPosition.first - radius, playerScreenPosition.second - radius));
 
     _window.draw(circle);
 
