@@ -40,6 +40,8 @@ private:
 
     void processEvents();
     void render();
+
+    void update();
 };
 
 #endif

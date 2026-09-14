@@ -2,6 +2,7 @@
 .qtcreator
 out
 .vs
+.vscode
 
 # Prerequisites
 *.d

@@ -36,3 +36,10 @@ sur l'écran, \(Y\) augmente vers le bas. Y = H/2 - y * z
 
 Réponse :
 On inverse la formule précédente : y = (H/2 - Y) / z
+
+*1.3 déplacement*
+
+Que se passe-t-il lorsque plusieurs touches directionnelles sont maintenues simultanément ? Le comportement obtenu vous paraît-il satisfaisant ?
+
+Non car le déplacement s'éffectue que pour une des touches et ne prend pas en compte les 2. 
+Mais pour rester appuyer cela fonctionne correctement. 
