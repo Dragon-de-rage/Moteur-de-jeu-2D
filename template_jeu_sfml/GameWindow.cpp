@@ -72,7 +72,6 @@ void GameWindow::render()
     _window.clear(sf::Color::White);
     sf::Vector2u screen_res = _window.getSize();
 #ifdef SFML_DEBUG // if in debug, prints the axis
-    sf::Vector2u screen_res = _window.getSize();
     float y = screen_res.y; // because screen_res.y is an uint
     sf::RectangleShape axe_x(sf::Vector2f(screen_res.x, 1));
     sf::RectangleShape axe_y(sf::Vector2f(1, -y));
