@@ -46,3 +46,17 @@ Y = -H + (y * z)
 
 
 Ensuite j'ai essayé de fix les bug du code (qui étaient prévu pour une version anterieur)
+
+## Cours du 14/09/26
+
+Réponses aux question de la section 2.1 : 
+
+1/ Pn/tn = 1    Pn+1/tn+1 = 1.3
+
+*résultats aproximatifs*
+
+2/ P(t) = 2t + A *(A étant une constante)*
+
+P(0) = 0 => P(0) = 0t + A => P(0) = A => A = 0
+
+3/ Pn+1 = Pn + 2 => suite arithmétique
