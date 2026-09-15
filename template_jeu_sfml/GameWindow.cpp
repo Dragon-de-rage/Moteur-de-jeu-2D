@@ -1,4 +1,5 @@
 #include <GameWindow.h>
+#include <iostream>
 
 GameWindow::GameWindow()
 {}
@@ -24,7 +25,7 @@ void GameWindow::show(int width, int height, const std::string& title)
 {
     _window.create(sf::VideoMode(sf::Vector2u(width, height)), title);
 
-    _window.setFramerateLimit(50);
+    _window.setFramerateLimit(framerate);
 
     while (_window.isOpen())
     {
@@ -93,6 +94,31 @@ void GameWindow::render()
         graduation.setPosition(sf::Vector2f(screen_res.x / 2 - 5, screen_res.y / 2 - i));
         _window.draw(graduation);
     }
+
+	double dt = 1.0 / framerate; // time between two frames in seconds
+
+	double deltaX = playerX - playerbeforeX;
+	double deltaY = playerY - playerbeforeY;
+
+	double distance = std::sqrt(deltaX * deltaX + deltaY * deltaY);
+
+	double vitesse = distance / dt; // vitesse = distance / temps
+
+    static sf::Font font;
+    static bool fontLoaded = font.openFromFile("arial.ttf"); 
+
+    if (fontLoaded) {
+        sf::Text textVitesse(font);
+        textVitesse.setCharacterSize(18);
+        textVitesse.setFillColor(sf::Color::Red);
+        textVitesse.setPosition(sf::Vector2f(10.f, 10.f));
+        textVitesse.setString("Speed : " + std::to_string(vitesse) + " units/sec");
+        _window.draw(textVitesse);
+    }
+    else { std::cout << "Speed : " << vitesse << " units/sec" << std::endl; } // Print speed to console if font is not loaded
+
+
+
 #endif
 
     // Draw player as a yellow circle.
@@ -122,6 +148,9 @@ void GameWindow::render()
 
 void GameWindow::update()
 {
+	playerbeforeX = playerX;
+	playerbeforeY = playerY;
+
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
     {
         playerX -= 1.0;

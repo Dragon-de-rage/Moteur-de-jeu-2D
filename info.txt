@@ -1,0 +1,3 @@
+le fichier arial.ttf est a mettre dans le dossier du .exe.
+
+Cela sert a l'affichage de la vitesse du joueur en mode debug. 

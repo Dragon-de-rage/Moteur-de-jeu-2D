@@ -32,6 +32,11 @@ public:
 	double playerX = 0.0;
 	double playerY = 0.0;
 
+	double playerbeforeX = 0.0;
+	double playerbeforeY = 0.0;
+
+	int framerate = 50;
+
     void show(int width, int height, const std::string& title);
 
 private:
