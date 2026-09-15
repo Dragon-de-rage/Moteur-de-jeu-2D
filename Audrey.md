@@ -60,3 +60,11 @@ Réponses aux question de la section 2.1 :
 P(0) = 0 => P(0) = 0t + A => P(0) = A => A = 0
 
 3/ Pn+1 = Pn + 2 => suite arithmétique
+
+## Cours du 15/09/26
+
+Création de la courbe comparative pour le 2.1 sur tableur
+
+Avancement des question du 2.2 (avec Elven) 
+
+À noter que nous avons eu des dificultés concerant la démonstration de l'exercice 1 du 2.2
