@@ -43,3 +43,34 @@ Que se passe-t-il lorsque plusieurs touches directionnelles sont maintenues simu
 
 Non car le déplacement s'éffectue que pour une des touches et ne prend pas en compte les 2. 
 Mais pour rester appuyer cela fonctionne correctement. 
+
+*2.3 euler 1*
+
+Que devient l’équation différentielle de l’évolution de la vitesse du joueur, une fois
+appliquée la méthode d’Euler ?
+
+m dv/dt = G - kv  donc dv/dt = G - (k/m) * v
+
+dv/dt != vn+1 - vn / deltaT 
+
+donc (vn+1 - vn) / deltaT = G - k/m vn
+
+*2.3 euler 2*
+Établir une relation de récurrence de la forme vn+1 = a × vn + b.
+
+(vn+1 - vn) / deltaT = G - k/m vn 
+
+en isolant on a  vn+1 - vn = deltaT (G - k/m vn)
+
+vn+1 = vn + deltaT G - ((k deltaT) / m) vn
+
+vn+1 = (1-((k deltaT) / m)) vn + deltaT G
+
+donc on a : 
+
+a = 1-((k deltaT) / m)
+b = deltaT G
+
+*2.3 euler 3*
+
+c'est une suite arithmético-géométriques
