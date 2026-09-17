@@ -20,6 +20,13 @@ WorldPoint toWorld(const ScreenPoint& point, int W, int H, double z)
     return { X, Y };
 }
 
+// we should add every forces that we create in the sum
+float GameWindow::get_forcesX() {
+    return gravity[0];
+}
+float GameWindow::get_forcesY() {
+    return gravity[1];
+}
 
 void GameWindow::show(int width, int height, const std::string& title)
 {
@@ -149,25 +156,39 @@ void GameWindow::render()
 void GameWindow::update()
 {
 	playerbeforeX = playerX;
-	playerbeforeY = playerY;
+    playerbeforeY = playerY;
+
+    // calculating delta_t (time elapsed since last frame)
+    std::chrono::duration<double> delta_t = std::chrono::high_resolution_clock::now() - last_frame_time;
+    double delta_t_sec = delta_t.count();
+    // updating time of the last frame for the next update
+    last_frame_time = std::chrono::high_resolution_clock::now();
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
     {
-        playerX -= 1.0;
+        // playerX -= 1.0;
+        player_speedX -= (get_forcesX() / mass) * delta_t_sec;
+        playerX -= player_speedX * delta_t_sec + playerX;
     }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
     {
-        playerX += 1.0;
+        // playerX += 1.0;
+        player_speedX += (get_forcesX() / mass) * delta_t_sec;
+        playerX += player_speedX * delta_t_sec + playerX;
     }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
     {
-        playerY -= 1.0;
+        // playerY -= 1.0;
+        player_speedY -= (get_forcesY() / mass) * delta_t_sec;
+        playerY -= player_speedY * delta_t_sec + playerY;
     }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
     {
-        playerY += 1.0;
+        // playerY += 1.0;
+        player_speedY += (get_forcesY() / mass) * delta_t_sec;
+        playerY += player_speedY * delta_t_sec + playerY;
     }
 }
