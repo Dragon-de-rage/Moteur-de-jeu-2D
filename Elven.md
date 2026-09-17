@@ -46,3 +46,27 @@ or G/k = -A, d'où :
 <=> v(t) = A(-e(1) + 1) / e(1) = A * ((-e(1) +1) / e(1)) ≃ 2/3.
 Or, en reprenant les questions précédentes, on a remarqué que A était la vitesse limite de notre module, puisque quand t -> +∞, e(-t/τ) -> 0.
 Ainsi, τ représente le temps auquel on aura atteint les 2/3 de la vitesse max théorique, puisque les 2/3 de A.
+
+
+Newton et Euler explicite :
+
+On sait que :
+m * dv⃗/dt = F⃗ d'où
+{m * dvx/dt = Fx
+{m * dvy/dt = Fy
+
+Donc :
+vx,n+1 = vx,n + dvx/dt * Δt
+    = vx,n + Fx/m * Δt
+
+Idem pour vy,n+1
+
+
+Pour la position :
+vx = dx/dt, et d'après la méthode d'Euler :
+dx/dt ≃ (xn+1 - xn)/Δt
+donc :
+xn+1 = dx/dt * Δt + xn
+     = vx * Δt + xn
+
+Idem pour yn+1
