@@ -90,3 +90,22 @@ L = G / k
 donc vn = L + (v0 - L) a^n
 
 vn = G/k + (v0 - G/k)(1- (k deltaT)/m) ^n
+
+*2.3 courbes*
+
+Les paramètres du TP sont :
+
+m=1208 kg
+k=1,8
+G=100
+v_0=0
+
+vn=1 = (1- (1.8* DeltaT)/1208) vn + (DeltaT * 100) / 1208
+
+pour Delta T = 200 on peut voir que la courbes augmente et converge vers 55
+
+pour Delta T = 10 on peut voir que la courbe est linéaire et augmente
+ 
+pour Delta T = 1000 elle oscille mais converge vers 55
+
+pour Delta T = 1500 elle est droite et oscille vers 20000s
