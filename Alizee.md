@@ -49,11 +49,11 @@ Mais pour rester appuyer cela fonctionne correctement.
 Que devient l’équation différentielle de l’évolution de la vitesse du joueur, une fois
 appliquée la méthode d’Euler ?
 
-m dv/dt = G - kv  donc dv/dt = G - (k/m) * v
+m dv/dt = G - kv  donc dv/dt = G/m - (k/m) * v
 
 dv/dt != vn+1 - vn / deltaT 
 
-donc (vn+1 - vn) / deltaT = G - k/m vn
+donc (vn+1 - vn) / deltaT = G/m - k/m vn
 
 *2.3 euler 2*
 Établir une relation de récurrence de la forme vn+1 = a × vn + b.
@@ -62,15 +62,31 @@ donc (vn+1 - vn) / deltaT = G - k/m vn
 
 en isolant on a  vn+1 - vn = deltaT (G - k/m vn)
 
-vn+1 = vn + deltaT G - ((k deltaT) / m) vn
+vn+1 = vn + deltaT ((G / m) - (k / m) vn)
 
-vn+1 = (1-((k deltaT) / m)) vn + deltaT G
+vn+1 = (1-((k deltaT) / m)) vn + (deltaT G) / m
 
 donc on a : 
 
 a = 1-((k deltaT) / m)
-b = deltaT G
+b = deltaT G / m
 
 *2.3 euler 3*
 
 c'est une suite arithmético-géométriques
+
+faut trouver L tel que L = aL + b
+
+donc L (1-a) = b   L = b / 1-a
+
+on remplace L = ((deltaT G) / m ) / 1-(1-(k deltaT)/ m)
+
+L = ((delta T G) / m ) / (k delta T) / m
+
+L = (delta T G) / m * m / (k delta T) 
+
+L = G / k 
+
+donc vn = L + (v0 - L) a^n
+
+vn = G/k + (v0 - G/k)(1- (k deltaT)/m) ^n
