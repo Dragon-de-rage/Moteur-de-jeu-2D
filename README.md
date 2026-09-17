@@ -17,8 +17,9 @@ Pour cela nous utiliseront SFML et Visual Studio pour coder en C++.
 
 ### Installing
 
-* How/where to download your program
-* Any modifications needed to be made to files/folders
+* 
+
+* recuperer le fichier 'arrial.ttf' et le placer dans le dossier où il y a le fichier 'R5A12.slnx' créer par le compilateur. 
 
 ### Executing program
 
