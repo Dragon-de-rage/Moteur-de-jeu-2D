@@ -65,7 +65,7 @@ P(0) = 0 => P(0) = 0t + A => P(0) = A => A = 0
 
 Création de la courbe comparative pour le 2.1 sur tableur
 
-Avancement des question du 2.2 (avec Elven) 
+Avancement des question du 2.2 (avec Elven)
 
 À noter que nous avons eu des dificultés concerant la démonstration de l'exercice 1 du 2.2
 
@@ -74,3 +74,10 @@ Avancement des question du 2.2 (avec Elven)
 3/ A = (v(0)-100/1.8)/exp(-0/(1208/1.8)) = -100/1.8
 
 Nous avons tracé la courbes dans "Courbes_exercices.xlsx"
+
+## Cours du 17/09/26
+
+Nous nous sommes aperçu qu'il y avait une erreur avec notre courbe car elle ne partait pas de 0 et elle décélerait au lieu d'accelérer.
+
+Le problème était que nous avions pris A = 100/1.8 au lieu de A = -100/1.8.
+
