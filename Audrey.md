@@ -68,3 +68,9 @@ Création de la courbe comparative pour le 2.1 sur tableur
 Avancement des question du 2.2 (avec Elven) 
 
 À noter que nous avons eu des dificultés concerant la démonstration de l'exercice 1 du 2.2
+
+2/ A = (v(t) - G/k)/exp(-t/τ)
+
+3/ A = (v(0)-100/1.8)/exp(-0/(1208/1.8)) = -100/1.8
+
+Nous avons tracé la courbes dans "Courbes_exercices.xlsx"
