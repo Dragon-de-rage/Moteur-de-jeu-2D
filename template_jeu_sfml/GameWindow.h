@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <chrono>
 #include <array>
+#include <optional>
 
 using ScreenPoint = std::pair<int, int>;
 using WorldPoint = std::pair<double, double>;
@@ -55,6 +56,12 @@ public:
 private:
 
     sf::RenderWindow _window;
+
+    // Texture et sprite utilisés pour afficher le joueur (image PNG)
+    sf::Texture playerTexture;
+    std::optional<sf::Sprite> playerSprite;
+
+    float playerAngleDeg = 0.f;
 
     void processEvents();
     void render();

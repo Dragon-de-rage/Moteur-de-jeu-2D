@@ -1,8 +1,21 @@
 #include <GameWindow.h>
 #include <iostream>
+#include <cmath>
 
 GameWindow::GameWindow()
-{}
+{
+    // Charge l'image qui remplacera le rond jaune.
+    // Le fichier doit se trouver à côté de l'exécutable (voir CMakeLists.txt).
+    std::string imagePath = std::string("Images/animal_linux_penguin_2598.png");
+    if (playerTexture.loadFromFile(imagePath))
+    {
+        playerSprite.emplace(playerTexture);
+    }
+    else
+    {
+        std::cout << "Impossible de charger " << imagePath << ", le cercle jaune sera utilise a la place." << std::endl;
+    }
+}
 
 ScreenPoint toScreen(const WorldPoint& point, int W, int H, double z)
 {
@@ -128,7 +141,7 @@ void GameWindow::render()
 
 #endif
 
-    // Draw player as a yellow circle.
+    // Draw player
     int radius = 10;
 
     //zoom factor
@@ -140,15 +153,46 @@ void GameWindow::render()
     // Convert player position to screen coordinates
     ScreenPoint playerScreenPosition = toScreen(playerPosition, screen_res.x, screen_res.y, z);
 
+    if (playerSprite)
+    {
+        // Centre l'origine du sprite sur son propre centre, pour que
+        // setPosition() positionne le CENTRE de l'image (comme le cercle avant).
+        sf::Vector2u texSize = playerTexture.getSize();
+        playerSprite->setOrigin(sf::Vector2f(texSize.x / 2.f, texSize.y / 2.f));
 
-    //create player circle shape
-    sf::CircleShape circle(radius);
+        // Optionnel : redimensionne l'image pour qu'elle fasse environ 2*radius de large.
+        // Commente ces deux lignes si tu veux garder la taille originale de l'image.
+        float scale = (radius * 2.f) / static_cast<float>(texSize.x);
+        playerSprite->setScale(sf::Vector2f(scale, scale));
 
-    circle.setFillColor(sf::Color::Yellow);
+        // --- Rotation selon la direction de deplacement ---
+        // (playerAngleDeg est calcule dans update(), pas ici : render() se contente
+        // de lire l'etat du jeu et de dessiner, il ne doit pas contenir de logique.)
 
-    circle.setPosition(sf::Vector2f(playerScreenPosition.first - radius, playerScreenPosition.second - radius));
+        // ROTATION_OFFSET : a ajuster selon l'orientation de base de ton image.
+        // Si l'image regarde vers la DROITE par defaut -> laisse 0.
+        // Si elle regarde vers le HAUT par defaut       -> mets 90.
+        // Si elle regarde vers la GAUCHE par defaut      -> mets 180.
+        // Si elle regarde vers le BAS par defaut         -> mets -90 (ou 270).
+        constexpr float ROTATION_OFFSET = 90.f;
 
-    _window.draw(circle);
+        playerSprite->setRotation(sf::degrees(playerAngleDeg + ROTATION_OFFSET));
+
+        playerSprite->setPosition(sf::Vector2f(playerScreenPosition.first, playerScreenPosition.second));
+
+        _window.draw(*playerSprite);
+    }
+    else
+    {
+        //create player circle shape
+        sf::CircleShape circle(radius);
+
+        circle.setFillColor(sf::Color::Yellow);
+
+        circle.setPosition(sf::Vector2f(playerScreenPosition.first - radius, playerScreenPosition.second - radius));
+
+        _window.draw(circle);
+    }
 
     _window.display();
 }
@@ -190,5 +234,18 @@ void GameWindow::update()
         // playerY += 1.0;
         player_speedY += (get_forcesY() / mass) * delta_t_sec;
         playerY += player_speedY * delta_t_sec + playerY;
+    }
+
+    // --- Direction de deplacement (utilisee par render() pour orienter le sprite) ---
+    double deltaX = playerX - playerbeforeX;
+    double deltaY = playerY - playerbeforeY;
+    double moveDistance = std::sqrt(deltaX * deltaX + deltaY * deltaY);
+
+    const double MOVE_THRESHOLD = 0.001;
+
+    if (moveDistance > MOVE_THRESHOLD)
+    {
+        constexpr double PI = 3.14159265358979323846;
+        playerAngleDeg = static_cast<float>(std::atan2(deltaY, deltaX) * 180.0 / PI);
     }
 }
