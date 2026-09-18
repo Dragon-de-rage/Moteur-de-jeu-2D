@@ -33,12 +33,19 @@ WorldPoint toWorld(const ScreenPoint& point, int W, int H, double z)
     return { X, Y };
 }
 
-// we should add every forces that we create in the sum
-float GameWindow::get_forcesX() {
-    return gravity[0];
+// the sum of all vectorial absolute forces
+// absolute = not relative to speed or anything
+double GameWindow::get_forcesX() {
+    return gravity[0]*mass;
 }
-float GameWindow::get_forcesY() {
-    return gravity[1];
+double GameWindow::get_forcesY() {
+    return gravity[1]*mass;
+}
+
+// on néglige l'aire du solide selon la direction perpendiculaire à la vitesse S
+// le coeff. de frottements est ici utilisé comme le coeff. de traînée
+double GameWindow::compute_friction(double speed) {
+    return (speed * speed * masse_volumique_atmo * coef_frottements) / 2;
 }
 
 void GameWindow::show(int width, int height, const std::string& title)
@@ -155,25 +162,15 @@ void GameWindow::render()
 
     if (playerSprite)
     {
-        // Centre l'origine du sprite sur son propre centre, pour que
-        // setPosition() positionne le CENTRE de l'image (comme le cercle avant).
+        // Center sprite's origin on itself, for setPosition to work properly
         sf::Vector2u texSize = playerTexture.getSize();
         playerSprite->setOrigin(sf::Vector2f(texSize.x / 2.f, texSize.y / 2.f));
 
-        // Optionnel : redimensionne l'image pour qu'elle fasse environ 2*radius de large.
-        // Commente ces deux lignes si tu veux garder la taille originale de l'image.
+        // sprite redimensioning
         float scale = (radius * 2.f) / static_cast<float>(texSize.x);
         playerSprite->setScale(sf::Vector2f(scale, scale));
 
-        // --- Rotation selon la direction de deplacement ---
-        // (playerAngleDeg est calcule dans update(), pas ici : render() se contente
-        // de lire l'etat du jeu et de dessiner, il ne doit pas contenir de logique.)
-
-        // ROTATION_OFFSET : a ajuster selon l'orientation de base de ton image.
-        // Si l'image regarde vers la DROITE par defaut -> laisse 0.
-        // Si elle regarde vers le HAUT par defaut       -> mets 90.
-        // Si elle regarde vers la GAUCHE par defaut      -> mets 180.
-        // Si elle regarde vers le BAS par defaut         -> mets -90 (ou 270).
+        // to adjust according to the base rotation we want (90 = UP)
         constexpr float ROTATION_OFFSET = 90.f;
 
         playerSprite->setRotation(sf::degrees(playerAngleDeg + ROTATION_OFFSET));
@@ -203,40 +200,56 @@ void GameWindow::update()
     playerbeforeY = playerY;
 
     // calculating delta_t (time elapsed since last frame)
-    std::chrono::duration<double> delta_t = std::chrono::high_resolution_clock::now() - last_frame_time;
+    time_point now = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> delta_t = now - last_frame_time;
     double delta_t_sec = delta_t.count();
     // updating time of the last frame for the next update
-    last_frame_time = std::chrono::high_resolution_clock::now();
+    last_frame_time = now;
 
+    // compute friction due to current speed to apply its reduction to the next move
+    double frictionX = compute_friction(player_speedX);
+    double frictionY = compute_friction(player_speedY);
+
+    // if a key is pressed, we add propulsion
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
     {
-        // playerX -= 1.0;
-        player_speedX -= (get_forcesX() / mass) * delta_t_sec;
-        playerX -= player_speedX * delta_t_sec + playerX;
+        player_speedX -= (propulsion/mass) * delta_t_sec;
     }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
     {
-        // playerX += 1.0;
-        player_speedX += (get_forcesX() / mass) * delta_t_sec;
-        playerX += player_speedX * delta_t_sec + playerX;
+        player_speedX += (propulsion/mass) * delta_t_sec;
     }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
     {
-        // playerY -= 1.0;
-        player_speedY -= (get_forcesY() / mass) * delta_t_sec;
-        playerY -= player_speedY * delta_t_sec + playerY;
+        player_speedY -= (propulsion/mass) * delta_t_sec;
     }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
     {
-        // playerY += 1.0;
-        player_speedY += (get_forcesY() / mass) * delta_t_sec;
-        playerY += player_speedY * delta_t_sec + playerY;
+        player_speedY += (propulsion/mass) * delta_t_sec;
     }
 
-    // --- Direction de deplacement (utilisee par render() pour orienter le sprite) ---
+    // whether or not a key is pressed, we compute new speed without propulsion
+    if (player_speedX < 0)
+    {
+        player_speedX -= ((get_forcesX() - frictionX)/ mass) * delta_t_sec;
+    } else {
+        player_speedX += ((get_forcesX() - frictionX)/ mass) * delta_t_sec;
+    }
+
+    if (player_speedY < 0)
+    {
+        player_speedY -= ((get_forcesY() - frictionY)/ mass) * delta_t_sec;
+    } else {
+        player_speedY += ((get_forcesY() - frictionY)/ mass) * delta_t_sec;
+    }
+
+    playerX += player_speedX * delta_t_sec;
+    playerY += player_speedY * delta_t_sec;
+
+    // used by render() to rotate the sprite
     double deltaX = playerX - playerbeforeX;
     double deltaY = playerY - playerbeforeY;
     double moveDistance = std::sqrt(deltaX * deltaX + deltaY * deltaY);

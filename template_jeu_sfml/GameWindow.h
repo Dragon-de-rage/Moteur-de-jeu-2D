@@ -46,12 +46,16 @@ public:
 
 
     // Forces applied to characters
-    // They are vectors, X and Y norms are in Newtons
+    // They are either const or vectors, X and Y norms are in Newtons
     // Use get_forcesX() and ...Y() function to get all the forces applied on one axis
-    std::array<float, 2> gravity = {0.0f, 10.0f};
+    std::array<const double, 2> gravity = {0.0, /*9.80665*/0.0};
+    // constantes (plus tard paramétrable dans moteur)
+    double propulsion = 100000.0;
+    double coef_frottements = 5.0;
+    double masse_volumique_atmo = 1.225;
 
     // Player mass (in kilograms)
-    float mass = 500;
+    double mass = 1000.0;
 
 private:
 
@@ -66,8 +70,9 @@ private:
     void processEvents();
     void render();
 
-    float get_forcesX();
-    float get_forcesY();
+    double get_forcesX();
+    double get_forcesY();
+    double compute_friction(double speed);
 
     void update();
 };
