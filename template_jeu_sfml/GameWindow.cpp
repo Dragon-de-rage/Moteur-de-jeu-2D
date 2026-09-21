@@ -5,7 +5,7 @@
 GameWindow::GameWindow()
 {
     // Charge l'image qui remplacera le rond jaune.
-    // Le fichier doit se trouver à côté de l'exécutable (voir CMakeLists.txt).
+    // Le fichier doit se trouver à côté de l'exécutable.
     std::string imagePath = std::string("Images/animal_linux_penguin_2598.png");
     if (playerTexture.loadFromFile(imagePath))
     {
@@ -129,7 +129,7 @@ void GameWindow::render()
 
 	double distance = std::sqrt(deltaX * deltaX + deltaY * deltaY);
 
-	double vitesse = distance / dt; // vitesse = distance / temps
+	double vitesse = distance / dt; // speed = distance / time
 
     static sf::Font font;
     static bool fontLoaded = font.openFromFile("arial.ttf"); 
@@ -148,17 +148,11 @@ void GameWindow::render()
 
 #endif
 
-    // Draw player
-    int radius = 10;
-
-    //zoom factor
-    double z = 1.0; // Adjust this value to change the zoom level
-
     //player position in screen coordinates
     WorldPoint playerPosition = { playerX, playerY };
 
     // Convert player position to screen coordinates
-    ScreenPoint playerScreenPosition = toScreen(playerPosition, screen_res.x, screen_res.y, z);
+    ScreenPoint playerScreenPosition = toScreen(playerPosition, screen_res.x, screen_res.y, zoom_factor);
 
     if (playerSprite)
     {
@@ -167,7 +161,7 @@ void GameWindow::render()
         playerSprite->setOrigin(sf::Vector2f(texSize.x / 2.f, texSize.y / 2.f));
 
         // sprite redimensioning
-        float scale = (radius * 2.f) / static_cast<float>(texSize.x);
+        float scale = (radius*3) / static_cast<float>(texSize.x);
         playerSprite->setScale(sf::Vector2f(scale, scale));
 
         // to adjust according to the base rotation we want (90 = UP)
@@ -248,6 +242,34 @@ void GameWindow::update()
 
     playerX += player_speedX * delta_t_sec;
     playerY += player_speedY * delta_t_sec;
+
+    sf::Vector2u screen_res = _window.getSize();
+
+	//calculate the limits of the player's position based on the screen size and zoom factor
+    double xMax = (screen_res.x / 2.0) / zoom_factor - radius;
+    double xMin = -xMax;
+
+    double yMax = (screen_res.y / 2.0) / zoom_factor - radius;
+    double yMin = -yMax;
+
+	//check if the player is out of bounds and adjust position and speed accordingly
+    if (playerX > xMax) {
+        playerX = xMax;               
+        player_speedX = -player_speedX;
+    }
+    else if (playerX < xMin) {
+        playerX = xMin;
+        player_speedX = -player_speedX;
+    }
+
+    if (playerY > yMax) {
+        playerY = yMax;
+        player_speedY = -player_speedY;
+    }
+    else if (playerY < yMin) {
+        playerY = yMin;
+        player_speedY = -player_speedY;
+    }
 
     // used by render() to rotate the sprite
     double deltaX = playerX - playerbeforeX;
