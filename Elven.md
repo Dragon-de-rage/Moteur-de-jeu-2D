@@ -70,3 +70,6 @@ xn+1 = dx/dt * Δt + xn
      = vx * Δt + xn
 
 Idem pour yn+1
+
+En calculant les frottements (selon formule trouvée sur internet, proportionnels au carré de la vitesse), la position du joueur évolue de façon plutôt réaliste.
+Une gravité constante vers le bas entraîne bien sa chute progressive.

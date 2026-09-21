@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef GAMEWINDOW_H
 #define GAMEWINDOW_H
 
@@ -44,11 +46,13 @@ public:
 
     void show(int width, int height, const std::string& title);
 
+    float playerAngleDeg = 0.f;
+    std::string background = "";
 
     // Forces applied to characters
     // They are either const or vectors, X and Y norms are in Newtons
     // Use get_forcesX() and ...Y() function to get all the forces applied on one axis
-    std::array<const double, 2> gravity = {0.0, /*9.80665*/0.0};
+    std::array<const double, 2> gravity = {0.0, 9.80665};
     // constantes (plus tard paramétrable dans moteur)
     double propulsion = 100000.0;
     double coef_frottements = 5.0;
@@ -64,8 +68,6 @@ private:
     // Texture et sprite utilisés pour afficher le joueur (image PNG)
     sf::Texture playerTexture;
     std::optional<sf::Sprite> playerSprite;
-
-    float playerAngleDeg = 0.f;
 
     void processEvents();
     void render();
