@@ -6,14 +6,24 @@ GameWindow::GameWindow()
 {
     // Charge l'image qui remplacera le rond jaune.
     // Le fichier doit se trouver à côté de l'exécutable.
-    std::string imagePath = std::string("Images/animal_linux_penguin_2598.png");
-    if (playerTexture.loadFromFile(imagePath))
+    std::string playerPath = std::string("Images/animal_linux_penguin_2598.png");
+    if (playerTexture.loadFromFile(playerPath))
     {
         playerSprite.emplace(playerTexture);
     }
     else
     {
-        std::cout << "Impossible de charger " << imagePath << ", le cercle jaune sera utilise a la place." << std::endl;
+        std::cout << "Impossible de charger " << playerPath << ", le cercle jaune sera utilise a la place." << std::endl;
+    }
+
+    std::string backgroundPath = "Images/space-background.jpg";
+    if (backgroundTexture.loadFromFile(backgroundPath))
+    {
+        backgroundSprite.emplace(backgroundTexture);
+    }
+    else
+    {
+        std::cout << "Impossible de charger " << backgroundPath << ", aucun fond d'écran." << std::endl;
     }
 }
 
@@ -147,7 +157,16 @@ void GameWindow::render()
 
 
 #endif
+    // Draw background
+    backgroundSprite->setScale(sf::Vector2f(screen_res.x / backgroundSprite->getLocalBounds().size.x,
+                                            screen_res.y / backgroundSprite->getLocalBounds().size.y));
+    _window.draw(*backgroundSprite);
 
+    // Draw player
+    int radius = 10;
+
+    //zoom factor
+    double z = 1.0; // Adjust this value to change the zoom level
     //player position in screen coordinates
     WorldPoint playerPosition = { playerX, playerY };
 
@@ -233,12 +252,7 @@ void GameWindow::update()
         player_speedX += ((get_forcesX() - frictionX)/ mass) * delta_t_sec;
     }
 
-    if (player_speedY < 0)
-    {
-        player_speedY -= ((get_forcesY() - frictionY)/ mass) * delta_t_sec;
-    } else {
-        player_speedY += ((get_forcesY() - frictionY)/ mass) * delta_t_sec;
-    }
+    player_speedY += ((get_forcesY() - frictionY)/ mass) * delta_t_sec;
 
     playerX += player_speedX * delta_t_sec;
     playerY += player_speedY * delta_t_sec;
