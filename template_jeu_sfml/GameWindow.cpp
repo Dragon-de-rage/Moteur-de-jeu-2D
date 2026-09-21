@@ -4,17 +4,7 @@
 
 GameWindow::GameWindow()
 {
-    // Charge l'image qui remplacera le rond jaune.
-    // Le fichier doit se trouver à côté de l'exécutable (voir CMakeLists.txt).
-    std::string imagePath = std::string("Images/animal_linux_penguin_2598.png");
-    if (playerTexture.loadFromFile(imagePath))
-    {
-        playerSprite.emplace(playerTexture);
-    }
-    else
-    {
-        std::cout << "Impossible de charger " << imagePath << ", le cercle jaune sera utilise a la place." << std::endl;
-    }
+    //!\\ Instancier le joueur
 }
 
 ScreenPoint toScreen(const WorldPoint& point, int W, int H, double z)
@@ -48,11 +38,21 @@ double GameWindow::compute_friction(double speed) {
     return (speed * speed * masse_volumique_atmo * coef_frottements) / 2;
 }
 
+double GameWindow::compute_delta_t()
+{
+    // calculating delta_t (time elapsed since last frame)
+    time_point now = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> delta_t = now - last_frame_time;
+    
+    // updating time of the last frame for the next update
+    last_frame_time = now;
+
+    return delta_t.count();
+}
+
 void GameWindow::show(int width, int height, const std::string& title)
 {
     _window.create(sf::VideoMode(sf::Vector2u(width, height)), title);
-
-    _window.setFramerateLimit(framerate);
 
     while (_window.isOpen())
     {
@@ -100,6 +100,7 @@ void GameWindow::render()
     _window.clear(sf::Color::White);
     sf::Vector2u screen_res = _window.getSize();
 #ifdef SFML_DEBUG // if in debug, prints the axis
+    // Debug : draw axes
     float y = screen_res.y; // because screen_res.y is an uint
     sf::RectangleShape axe_x(sf::Vector2f(screen_res.x, 1));
     sf::RectangleShape axe_y(sf::Vector2f(1, -y));
@@ -122,8 +123,10 @@ void GameWindow::render()
         _window.draw(graduation);
     }
 
-	double dt = 1.0 / framerate; // time between two frames in seconds
 
+	double dt = compute_delta_t(); // time between two frames in seconds
+
+	//!\\ TODO: Changer playerX et playerY avec les proprétés de l'objet Player
 	double deltaX = playerX - playerbeforeX;
 	double deltaY = playerY - playerbeforeY;
 
@@ -160,6 +163,8 @@ void GameWindow::render()
     // Convert player position to screen coordinates
     ScreenPoint playerScreenPosition = toScreen(playerPosition, screen_res.x, screen_res.y, z);
 
+
+	//!\\ TODO: Changer playerSprite et playerTexture avec les proprétés de l'objet Player
     if (playerSprite)
     {
         // Center sprite's origin on itself, for setPosition to work properly
@@ -196,16 +201,13 @@ void GameWindow::render()
 
 void GameWindow::update()
 {
+	//!\\ TODO: Changer playerX et playerY avec les proprétés de l'objet Player
 	playerbeforeX = playerX;
     playerbeforeY = playerY;
 
-    // calculating delta_t (time elapsed since last frame)
-    time_point now = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> delta_t = now - last_frame_time;
-    double delta_t_sec = delta_t.count();
-    // updating time of the last frame for the next update
-    last_frame_time = now;
+	double delta_t_sec = compute_delta_t();
 
+	//!\\ TODO: Changer player_speedX et player_speedY avec les proprétés de l'objet Player
     // compute friction due to current speed to apply its reduction to the next move
     double frictionX = compute_friction(player_speedX);
     double frictionY = compute_friction(player_speedY);
@@ -259,6 +261,7 @@ void GameWindow::update()
     if (moveDistance > MOVE_THRESHOLD)
     {
         constexpr double PI = 3.14159265358979323846;
+		//!\\ TODO: Changer playerAngleDeg avec les proprétés de l'objet Player
         playerAngleDeg = static_cast<float>(std::atan2(deltaY, deltaX) * 180.0 / PI);
     }
 }
