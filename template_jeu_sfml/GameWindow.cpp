@@ -252,7 +252,12 @@ void GameWindow::update()
         player_speedX += ((get_forcesX() - frictionX)/ mass) * delta_t_sec;
     }
 
-    player_speedY += ((get_forcesY() - frictionY)/ mass) * delta_t_sec;
+    if (player_speedY < 0)
+    {
+        player_speedY -= ((-get_forcesY() - frictionY)/ mass) * delta_t_sec;
+    } else {
+        player_speedY += ((get_forcesY() - frictionY)/ mass) * delta_t_sec;
+    }
 
     playerX += player_speedX * delta_t_sec;
     playerY += player_speedY * delta_t_sec;
