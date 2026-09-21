@@ -109,6 +109,11 @@ void GameWindow::render()
     // Clear background with White color.
     _window.clear(sf::Color::White);
     sf::Vector2u screen_res = _window.getSize();
+
+    // Draw background
+    backgroundSprite->setScale(sf::Vector2f(screen_res.x / backgroundSprite->getLocalBounds().size.x,
+        screen_res.y / backgroundSprite->getLocalBounds().size.y));
+    _window.draw(*backgroundSprite);
 #ifdef SFML_DEBUG // if in debug, prints the axis
     float y = screen_res.y; // because screen_res.y is an uint
     sf::RectangleShape axe_x(sf::Vector2f(screen_res.x, 1));
@@ -157,10 +162,7 @@ void GameWindow::render()
 
 
 #endif
-    // Draw background
-    backgroundSprite->setScale(sf::Vector2f(screen_res.x / backgroundSprite->getLocalBounds().size.x,
-                                            screen_res.y / backgroundSprite->getLocalBounds().size.y));
-    _window.draw(*backgroundSprite);
+
 
     // Draw player
     int radius = 10;
