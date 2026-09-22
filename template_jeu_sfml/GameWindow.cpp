@@ -4,27 +4,8 @@
 
 GameWindow::GameWindow()
 {
-    // Charge l'image qui remplacera le rond jaune.
-    // Le fichier doit se trouver à côté de l'exécutable.
-    std::string playerPath = std::string("Images/animal_linux_penguin_2598.png");
-    if (playerTexture.loadFromFile(playerPath))
-    {
-        playerSprite.emplace(playerTexture);
-    }
-    else
-    {
-        std::cout << "Impossible de charger " << playerPath << ", le cercle jaune sera utilise a la place." << std::endl;
-    }
-
-    std::string backgroundPath = "Images/space-background.jpg";
-    if (backgroundTexture.loadFromFile(backgroundPath))
-    {
-        backgroundSprite.emplace(backgroundTexture);
-    }
-    else
-    {
-        std::cout << "Impossible de charger " << backgroundPath << ", aucun fond d'écran." << std::endl;
-    }
+    //!\\ Instancier le joueur
+	player = Player(0.0, 0.0);
 }
 
 ScreenPoint toScreen(const WorldPoint& point, int W, int H, double z)
@@ -58,11 +39,21 @@ double GameWindow::compute_friction(double speed) {
     return (speed * speed * masse_volumique_atmo * coef_frottements) / 2;
 }
 
+double GameWindow::compute_delta_t()
+{
+    // calculating delta_t (time elapsed since last frame)
+    time_point now = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> delta_t = now - last_frame_time;
+    
+    // updating time of the last frame for the next update
+    last_frame_time = now;
+
+    return delta_t.count();
+}
+
 void GameWindow::show(int width, int height, const std::string& title)
 {
     _window.create(sf::VideoMode(sf::Vector2u(width, height)), title);
-
-    _window.setFramerateLimit(framerate);
 
     while (_window.isOpen())
     {
@@ -115,6 +106,7 @@ void GameWindow::render()
         screen_res.y / backgroundSprite->getLocalBounds().size.y));
     _window.draw(*backgroundSprite);
 #ifdef SFML_DEBUG // if in debug, prints the axis
+    // Debug : draw axes
     float y = screen_res.y; // because screen_res.y is an uint
     sf::RectangleShape axe_x(sf::Vector2f(screen_res.x, 1));
     sf::RectangleShape axe_y(sf::Vector2f(1, -y));
@@ -137,10 +129,13 @@ void GameWindow::render()
         _window.draw(graduation);
     }
 
-	double dt = 1.0 / framerate; // time between two frames in seconds
 
-	double deltaX = playerX - playerbeforeX;
-	double deltaY = playerY - playerbeforeY;
+	double dt = compute_delta_t(); // time between two frames in seconds
+
+	//!\\ TODO: Changer playerX et playerY avec les proprétés de l'objet Player
+    double deltaX = player.m_posX - playerbeforeX;
+    double deltaY = player.m_posY - playerbeforeY;
+
 
 	double distance = std::sqrt(deltaX * deltaX + deltaY * deltaY);
 
@@ -170,29 +165,24 @@ void GameWindow::render()
     //zoom factor
     double z = 1.0; // Adjust this value to change the zoom level
     //player position in screen coordinates
-    WorldPoint playerPosition = { playerX, playerY };
+    WorldPoint playerPosition = { player.m_posX, player.m_posY };
 
     // Convert player position to screen coordinates
     ScreenPoint playerScreenPosition = toScreen(playerPosition, screen_res.x, screen_res.y, zoom_factor);
 
-    if (playerSprite)
-    {
-        // Center sprite's origin on itself, for setPosition to work properly
-        sf::Vector2u texSize = playerTexture.getSize();
-        playerSprite->setOrigin(sf::Vector2f(texSize.x / 2.f, texSize.y / 2.f));
 
-        // sprite redimensioning
-        float scale = (radius*3) / static_cast<float>(texSize.x);
-        playerSprite->setScale(sf::Vector2f(scale, scale));
+	//!\\ TODO: Changer playerSprite et playerTexture avec les proprétés de l'objet Player
+    if (player.m_sprite)
+    {
 
         // to adjust according to the base rotation we want (90 = UP)
         constexpr float ROTATION_OFFSET = 90.f;
 
-        playerSprite->setRotation(sf::degrees(playerAngleDeg + ROTATION_OFFSET));
+        player.m_sprite->setRotation(sf::degrees(player.m_angle + ROTATION_OFFSET));
 
-        playerSprite->setPosition(sf::Vector2f(playerScreenPosition.first, playerScreenPosition.second));
+        player.m_sprite->setPosition(sf::Vector2f(playerScreenPosition.first, playerScreenPosition.second));
 
-        _window.draw(*playerSprite);
+        _window.draw(*player.m_sprite);
     }
     else
     {
@@ -211,46 +201,45 @@ void GameWindow::render()
 
 void GameWindow::update()
 {
-	playerbeforeX = playerX;
-    playerbeforeY = playerY;
+	//!\\ TODO: Changer playerX et playerY avec les proprétés de l'objet Player
+	playerbeforeX = player.m_posX;
+    playerbeforeY = player.m_posY;
 
-    // calculating delta_t (time elapsed since last frame)
-    time_point now = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> delta_t = now - last_frame_time;
-    double delta_t_sec = delta_t.count();
-    // updating time of the last frame for the next update
-    last_frame_time = now;
+	double delta_t_sec = compute_delta_t();
 
+	//!\\ TODO: Changer player_speedX et player_speedY avec les proprétés de l'objet Player
     // compute friction due to current speed to apply its reduction to the next move
+
     //Ff,x​= −kvvx ; Ff,y​= −kvvy
-    double player_speed = std::sqrt(player_speedX*player_speedX + player_speedY*player_speedY);
+    double player_speed = std::sqrt(player.m_speedX * player.m_speedX + player.m_speedY * player.m_speedY);
     // double friction = compute_friction(player_speed);
-    double frictionX = -(coef_frottements * player_speed * player_speedX * masse_volumique_atmo)/2;
-    double frictionY = -(coef_frottements * player_speed * player_speedY * masse_volumique_atmo)/2;
+    double frictionX = -(coef_frottements * player_speed * player.m_speedX * masse_volumique_atmo)/2;
+    double frictionY = -(coef_frottements * player_speed * player.m_speedY * masse_volumique_atmo)/2;
+
     // if a key is pressed, we add propulsion
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
     {
-        player_speedX -= (propulsion/mass) * delta_t_sec;
+        player.m_speedX -= (propulsion/mass) * delta_t_sec;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
     {
-        player_speedX += (propulsion/mass) * delta_t_sec;
+        player.m_speedX += (propulsion/mass) * delta_t_sec;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
     {
-        player_speedY -= (propulsion/mass) * delta_t_sec;
+        player.m_speedY -= (propulsion/mass) * delta_t_sec;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
     {
-        player_speedY += (propulsion/mass) * delta_t_sec;
+        player.m_speedY += (propulsion/mass) * delta_t_sec;
     }
 
     // whether or not a key is pressed, we compute new speed without propulsion
-    player_speedX += ((get_forcesX() + frictionX)/ mass) * delta_t_sec;
-    player_speedY += ((get_forcesY() + frictionY)/ mass) * delta_t_sec;
+    player.m_speedX += ((get_forcesX() + frictionX)/ mass) * delta_t_sec;
+    player.m_speedY += ((get_forcesY() + frictionY)/ mass) * delta_t_sec;
 
-    playerX += player_speedX * delta_t_sec;
-    playerY += player_speedY * delta_t_sec;
+    player.m_posX += player.m_speedX * delta_t_sec;
+    player.m_posY += player.m_speedY * delta_t_sec;
 
     sf::Vector2u screen_res = _window.getSize();
 
@@ -281,8 +270,8 @@ void GameWindow::update()
     }
 
     // used by render() to rotate the sprite
-    double deltaX = playerX - playerbeforeX;
-    double deltaY = playerY - playerbeforeY;
+    double deltaX = player.m_posX - playerbeforeX;
+    double deltaY = player.m_posY - playerbeforeY;
     double moveDistance = std::sqrt(deltaX * deltaX + deltaY * deltaY);
 
     const double MOVE_THRESHOLD = 0.001;
@@ -290,6 +279,7 @@ void GameWindow::update()
     if (moveDistance > MOVE_THRESHOLD)
     {
         constexpr double PI = 3.14159265358979323846;
-        playerAngleDeg = static_cast<float>(std::atan2(deltaY, deltaX) * 180.0 / PI);
+		//!\\ TODO: Changer playerAngleDeg avec les proprétés de l'objet Player
+        player.m_angle = static_cast<float>(std::atan2(deltaY, deltaX) * 180.0 / PI);
     }
 }

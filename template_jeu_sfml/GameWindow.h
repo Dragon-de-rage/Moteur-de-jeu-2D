@@ -7,6 +7,8 @@
 #include <chrono>
 #include <array>
 #include <optional>
+#include "Entity.h"
+#include "Player.h"
 
 using ScreenPoint = std::pair<int, int>;
 using WorldPoint = std::pair<double, double>;
@@ -30,17 +32,8 @@ public:
     //  * Nothing.
 
     // position joueur
-
-	double playerX = 0.0;
-	double playerY = 0.0;
-
 	double playerbeforeX = 0.0;
 	double playerbeforeY = 0.0;
-
-    double player_speedX = 0.0;
-    double player_speedY = 0.0;
-
-    int framerate = 50;
 
     time_point last_frame_time = std::chrono::high_resolution_clock::now();
 
@@ -70,10 +63,8 @@ private:
 
     sf::RenderWindow _window;
 
-    // Texture et sprite utilisés pour afficher le joueur (image PNG)
-    sf::Texture playerTexture;
-    std::optional<sf::Sprite> playerSprite;
-    float playerAngleDeg = 0.f;
+	Player player;
+
     // Texture et sprite utilisés pour afficher le fond fixe
     sf::Texture backgroundTexture;
     std::optional<sf::Sprite> backgroundSprite;
@@ -84,6 +75,7 @@ private:
     double get_forcesX();
     double get_forcesY();
     double compute_friction(double speed);
+	double compute_delta_t();
 
     void update();
 };
