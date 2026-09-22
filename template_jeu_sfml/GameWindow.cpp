@@ -222,44 +222,32 @@ void GameWindow::update()
     last_frame_time = now;
 
     // compute friction due to current speed to apply its reduction to the next move
-    double frictionX = compute_friction(player_speedX);
-    double frictionY = compute_friction(player_speedY);
-
+    //Ff,x​= −kvvx ; Ff,y​= −kvvy
+    double player_speed = std::sqrt(player_speedX*player_speedX + player_speedY*player_speedY);
+    // double friction = compute_friction(player_speed);
+    double frictionX = -(coef_frottements * player_speed * player_speedX * masse_volumique_atmo)/2;
+    double frictionY = -(coef_frottements * player_speed * player_speedY * masse_volumique_atmo)/2;
     // if a key is pressed, we add propulsion
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
     {
         player_speedX -= (propulsion/mass) * delta_t_sec;
     }
-
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
     {
         player_speedX += (propulsion/mass) * delta_t_sec;
     }
-
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
     {
         player_speedY -= (propulsion/mass) * delta_t_sec;
     }
-
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
     {
         player_speedY += (propulsion/mass) * delta_t_sec;
     }
 
     // whether or not a key is pressed, we compute new speed without propulsion
-    if (player_speedX < 0)
-    {
-        player_speedX -= ((get_forcesX() - frictionX)/ mass) * delta_t_sec;
-    } else {
-        player_speedX += ((get_forcesX() - frictionX)/ mass) * delta_t_sec;
-    }
-
-    if (player_speedY < 0)
-    {
-        player_speedY -= ((-get_forcesY() - frictionY)/ mass) * delta_t_sec;
-    } else {
-        player_speedY += ((get_forcesY() - frictionY)/ mass) * delta_t_sec;
-    }
+    player_speedX += ((get_forcesX() + frictionX)/ mass) * delta_t_sec;
+    player_speedY += ((get_forcesY() + frictionY)/ mass) * delta_t_sec;
 
     playerX += player_speedX * delta_t_sec;
     playerY += player_speedY * delta_t_sec;
