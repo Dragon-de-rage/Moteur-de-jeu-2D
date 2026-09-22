@@ -7,6 +7,8 @@
 #include <chrono>
 #include <array>
 #include <optional>
+#include "Entity.h"
+#include "Player.h"
 
 using ScreenPoint = std::pair<int, int>;
 using WorldPoint = std::pair<double, double>;
@@ -54,6 +56,8 @@ public:
 private:
 
     sf::RenderWindow _window;
+
+	Player player;
 
     void processEvents();
     void render();

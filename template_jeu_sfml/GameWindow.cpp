@@ -5,6 +5,8 @@
 GameWindow::GameWindow()
 {
     //!\\ Instancier le joueur
+	player = Player(0.0, 0.0);
+    
 }
 
 ScreenPoint toScreen(const WorldPoint& point, int W, int H, double z)
@@ -127,8 +129,9 @@ void GameWindow::render()
 	double dt = compute_delta_t(); // time between two frames in seconds
 
 	//!\\ TODO: Changer playerX et playerY avec les proprétés de l'objet Player
-	double deltaX = playerX - playerbeforeX;
-	double deltaY = playerY - playerbeforeY;
+    double deltaX = player.m_posX - playerbeforeX;
+    double deltaY = player.m_posY - playerbeforeY;
+
 
 	double distance = std::sqrt(deltaX * deltaX + deltaY * deltaY);
 
@@ -158,31 +161,23 @@ void GameWindow::render()
     double z = 1.0; // Adjust this value to change the zoom level
 
     //player position in screen coordinates
-    WorldPoint playerPosition = { playerX, playerY };
+    WorldPoint playerPosition = { player.m_posX, player.m_posY };
 
     // Convert player position to screen coordinates
     ScreenPoint playerScreenPosition = toScreen(playerPosition, screen_res.x, screen_res.y, z);
 
 
 	//!\\ TODO: Changer playerSprite et playerTexture avec les proprétés de l'objet Player
-    if (playerSprite)
+    if (player.m_sprite)
     {
-        // Center sprite's origin on itself, for setPosition to work properly
-        sf::Vector2u texSize = playerTexture.getSize();
-        playerSprite->setOrigin(sf::Vector2f(texSize.x / 2.f, texSize.y / 2.f));
-
-        // sprite redimensioning
-        float scale = (radius * 2.f) / static_cast<float>(texSize.x);
-        playerSprite->setScale(sf::Vector2f(scale, scale));
-
         // to adjust according to the base rotation we want (90 = UP)
         constexpr float ROTATION_OFFSET = 90.f;
 
-        playerSprite->setRotation(sf::degrees(playerAngleDeg + ROTATION_OFFSET));
+        player.m_sprite->setRotation(sf::degrees(player.m_angle + ROTATION_OFFSET));
 
-        playerSprite->setPosition(sf::Vector2f(playerScreenPosition.first, playerScreenPosition.second));
+        player.m_sprite->setPosition(sf::Vector2f(playerScreenPosition.first, playerScreenPosition.second));
 
-        _window.draw(*playerSprite);
+        _window.draw(*player.m_sprite);
     }
     else
     {
@@ -202,58 +197,58 @@ void GameWindow::render()
 void GameWindow::update()
 {
 	//!\\ TODO: Changer playerX et playerY avec les proprétés de l'objet Player
-	playerbeforeX = playerX;
-    playerbeforeY = playerY;
+	playerbeforeX = player.m_posX;
+    playerbeforeY = player.m_posY;
 
 	double delta_t_sec = compute_delta_t();
 
 	//!\\ TODO: Changer player_speedX et player_speedY avec les proprétés de l'objet Player
     // compute friction due to current speed to apply its reduction to the next move
-    double frictionX = compute_friction(player_speedX);
-    double frictionY = compute_friction(player_speedY);
+    double frictionX = compute_friction(player.m_speedX);
+    double frictionY = compute_friction(player.m_speedY);
 
     // if a key is pressed, we add propulsion
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
     {
-        player_speedX -= (propulsion/mass) * delta_t_sec;
+        player.m_speedX -= (propulsion/mass) * delta_t_sec;
     }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
     {
-        player_speedX += (propulsion/mass) * delta_t_sec;
+        player.m_speedX += (propulsion/mass) * delta_t_sec;
     }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
     {
-        player_speedY -= (propulsion/mass) * delta_t_sec;
+        player.m_speedY -= (propulsion/mass) * delta_t_sec;
     }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
     {
-        player_speedY += (propulsion/mass) * delta_t_sec;
+        player.m_speedY += (propulsion/mass) * delta_t_sec;
     }
 
     // whether or not a key is pressed, we compute new speed without propulsion
-    if (player_speedX < 0)
+    if (player.m_speedX < 0)
     {
-        player_speedX -= ((get_forcesX() - frictionX)/ mass) * delta_t_sec;
+        player.m_speedX -= ((get_forcesX() - frictionX)/ mass) * delta_t_sec;
     } else {
-        player_speedX += ((get_forcesX() - frictionX)/ mass) * delta_t_sec;
+        player.m_speedX += ((get_forcesX() - frictionX)/ mass) * delta_t_sec;
     }
 
-    if (player_speedY < 0)
+    if (player.m_speedY < 0)
     {
-        player_speedY -= ((get_forcesY() - frictionY)/ mass) * delta_t_sec;
+        player.m_speedY -= ((get_forcesY() - frictionY)/ mass) * delta_t_sec;
     } else {
-        player_speedY += ((get_forcesY() - frictionY)/ mass) * delta_t_sec;
+        player.m_speedY += ((get_forcesY() - frictionY)/ mass) * delta_t_sec;
     }
 
-    playerX += player_speedX * delta_t_sec;
-    playerY += player_speedY * delta_t_sec;
+    player.m_posX += player.m_speedX * delta_t_sec;
+    player.m_posY += player.m_speedY * delta_t_sec;
 
     // used by render() to rotate the sprite
-    double deltaX = playerX - playerbeforeX;
-    double deltaY = playerY - playerbeforeY;
+    double deltaX = player.m_posX - playerbeforeX;
+    double deltaY = player.m_posY - playerbeforeY;
     double moveDistance = std::sqrt(deltaX * deltaX + deltaY * deltaY);
 
     const double MOVE_THRESHOLD = 0.001;
@@ -262,6 +257,6 @@ void GameWindow::update()
     {
         constexpr double PI = 3.14159265358979323846;
 		//!\\ TODO: Changer playerAngleDeg avec les proprétés de l'objet Player
-        playerAngleDeg = static_cast<float>(std::atan2(deltaY, deltaX) * 180.0 / PI);
+        player.m_angle = static_cast<float>(std::atan2(deltaY, deltaX) * 180.0 / PI);
     }
 }
