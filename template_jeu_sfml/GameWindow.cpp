@@ -144,21 +144,51 @@ void GameWindow::render()
     static sf::Font font;
     static bool fontLoaded = font.openFromFile("arial.ttf"); 
 
+
+    double v = std::sqrt(player_speedX * player_speedX + player_speedY * player_speedY);
+    double g = gravity[1];
+    double energieCinetique = 0.5 * mass * v * v /1000;
+    double energiePotentielle = mass * g * -playerY / 1000;
+    double energieTotale = energieCinetique + energiePotentielle;
+
     if (fontLoaded) {
         sf::Text textVitesse(font);
         textVitesse.setCharacterSize(18);
         textVitesse.setFillColor(sf::Color::Red);
         textVitesse.setPosition(sf::Vector2f(10.f, 10.f));
         textVitesse.setString("Speed : " + std::to_string(vitesse) + " units/sec");
+
+		sf::Text textEnergieCinetique(font);
+		textEnergieCinetique.setCharacterSize(18);
+		textEnergieCinetique.setFillColor(sf::Color::Red);
+		textEnergieCinetique.setPosition(sf::Vector2f(10.f, 30.f));
+		textEnergieCinetique.setString("Energie Cinetique : " + std::to_string(energieCinetique) + " J");
+
+		sf::Text textEnergiePotentielle(font);
+		textEnergiePotentielle.setCharacterSize(18);
+		textEnergiePotentielle.setFillColor(sf::Color::Red);
+		textEnergiePotentielle.setPosition(sf::Vector2f(10.f, 50.f));
+		textEnergiePotentielle.setString("Energie Potentielle : " + std::to_string(energiePotentielle) + " J");
+
+		sf::Text textEnergieTotale(font);
+		textEnergieTotale.setCharacterSize(18);
+		textEnergieTotale.setFillColor(sf::Color::Red);
+		textEnergieTotale.setPosition(sf::Vector2f(10.f, 70.f));
+		textEnergieTotale.setString("Energie Totale : " + std::to_string(energieTotale) + " J");
+
         _window.draw(textVitesse);
+        _window.draw(textEnergieCinetique);
+        _window.draw(textEnergiePotentielle);
+        _window.draw(textEnergieTotale);
     }
-    else { std::cout << "Speed : " << vitesse << " units/sec" << std::endl; } // Print speed to console if font is not loaded
-
-
+    else { 
+        std::cout << "Speed : " << vitesse << " units/sec" << std::endl; 
+		std::cout << "Energie Cinetique : " << energieCinetique << " MJ" << std::endl;
+		std::cout << "Energie Potentielle : " << energiePotentielle << " MJ" << std::endl;
+		std::cout << "Energie Totale : " << energieTotale << " MJ" << std::endl;
+    } // Print in console if font is not loaded
 
 #endif
-
-
     // Draw player
     int radius = 10;
 
@@ -252,12 +282,23 @@ void GameWindow::update()
 
 	//check if the player is out of bounds and adjust position and speed accordingly
     if (playerX > xMax) {
-        playerX = xMax;               
+        double oldX = playerX - player_speedX * delta_t_sec;
+        double timeToCollision = (xMax - oldX) / player_speedX;
+        double remainingTime = delta_t_sec - timeToCollision;
+
+        playerX = xMax;
         player_speedX = -player_speedX;
+
+        playerX += player_speedX * remainingTime;
     }
     else if (playerX < xMin) {
+        double oldX = playerX - player_speedX * delta_t_sec;
+        double timeToCollision = (xMin - oldX) / player_speedX;
+        double remainingTime = delta_t_sec - timeToCollision;
+
         playerX = xMin;
         player_speedX = -player_speedX;
+        playerX += player_speedX * remainingTime;
     }
 
     if (playerY > yMax) {
