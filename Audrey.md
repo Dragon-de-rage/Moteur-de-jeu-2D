@@ -81,3 +81,14 @@ Nous nous sommes aperçu qu'il y avait une erreur avec notre courbe car elle ne 
 
 Le problème était que nous avions pris A = 100/1.8 au lieu de A = -100/1.8.
 
+## Cours du 18/09/26
+
+Commencement de l'ajout de la classe abstraîte *Entity* (utilisation de l'IA pour la structure puis apropriation et début de modifications des classes)
+
+## Cours du 21/09/26
+
+Restructuration de *GameWindow* pour introduire *Entity* et ajout de la classe fille de *Entity* : *Player*
+
+J'ai eu des difficulter à adapter le code existant pour sortir le *player* de *GameWindow* et en faire une classe fonctionel sans rien perdre.
+
+Je n'ai pas encore fini l'intégration.

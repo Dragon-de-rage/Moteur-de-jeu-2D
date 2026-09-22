@@ -39,13 +39,12 @@ public:
 
     void show(int width, int height, const std::string& title);
 
-    std::string background = "";
-
     // Forces applied to characters
     // They are either const or vectors, X and Y norms are in Newtons
     // Use get_forcesX() and ...Y() function to get all the forces applied on one axis
-    std::array<const double, 2> gravity = {0.0, 9.80665};
+    std::array<double, 2> gravity = {0.0, 9.80665};
     // constantes (plus tard paramétrable dans moteur)
+
     double propulsion = 100000.0;
     double coef_frottements = 5.0;
     double masse_volumique_atmo = 1.225;
@@ -53,11 +52,22 @@ public:
     // Player mass (in kilograms)
     double mass = 1000.0;
 
+
+	// player radius (in pixels)
+    double radius = 10;
+
+	//zoom factor
+	double zoom_factor = 1.0;
+
 private:
 
     sf::RenderWindow _window;
 
 	Player player;
+
+    // Texture et sprite utilisés pour afficher le fond fixe
+    sf::Texture backgroundTexture;
+    std::optional<sf::Sprite> backgroundSprite;
 
     void processEvents();
     void render();

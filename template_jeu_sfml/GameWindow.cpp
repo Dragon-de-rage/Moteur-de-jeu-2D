@@ -6,7 +6,6 @@ GameWindow::GameWindow()
 {
     //!\\ Instancier le joueur
 	player = Player(0.0, 0.0);
-    
 }
 
 ScreenPoint toScreen(const WorldPoint& point, int W, int H, double z)
@@ -101,6 +100,11 @@ void GameWindow::render()
     // Clear background with White color.
     _window.clear(sf::Color::White);
     sf::Vector2u screen_res = _window.getSize();
+
+    // Draw background
+    backgroundSprite->setScale(sf::Vector2f(screen_res.x / backgroundSprite->getLocalBounds().size.x,
+        screen_res.y / backgroundSprite->getLocalBounds().size.y));
+    _window.draw(*backgroundSprite);
 #ifdef SFML_DEBUG // if in debug, prints the axis
     // Debug : draw axes
     float y = screen_res.y; // because screen_res.y is an uint
@@ -135,7 +139,7 @@ void GameWindow::render()
 
 	double distance = std::sqrt(deltaX * deltaX + deltaY * deltaY);
 
-	double vitesse = distance / dt; // vitesse = distance / temps
+	double vitesse = distance / dt; // speed = distance / time
 
     static sf::Font font;
     static bool fontLoaded = font.openFromFile("arial.ttf"); 
@@ -154,22 +158,23 @@ void GameWindow::render()
 
 #endif
 
+
     // Draw player
     int radius = 10;
 
     //zoom factor
     double z = 1.0; // Adjust this value to change the zoom level
-
     //player position in screen coordinates
     WorldPoint playerPosition = { player.m_posX, player.m_posY };
 
     // Convert player position to screen coordinates
-    ScreenPoint playerScreenPosition = toScreen(playerPosition, screen_res.x, screen_res.y, z);
+    ScreenPoint playerScreenPosition = toScreen(playerPosition, screen_res.x, screen_res.y, zoom_factor);
 
 
 	//!\\ TODO: Changer playerSprite et playerTexture avec les proprétés de l'objet Player
     if (player.m_sprite)
     {
+
         // to adjust according to the base rotation we want (90 = UP)
         constexpr float ROTATION_OFFSET = 90.f;
 
@@ -204,47 +209,65 @@ void GameWindow::update()
 
 	//!\\ TODO: Changer player_speedX et player_speedY avec les proprétés de l'objet Player
     // compute friction due to current speed to apply its reduction to the next move
-    double frictionX = compute_friction(player.m_speedX);
-    double frictionY = compute_friction(player.m_speedY);
+
+    //Ff,x​= −kvvx ; Ff,y​= −kvvy
+    double player_speed = std::sqrt(player.m_speedX * player.m_speedX + player.m_speedY * player.m_speedY);
+    // double friction = compute_friction(player_speed);
+    double frictionX = -(coef_frottements * player_speed * player.m_speedX * masse_volumique_atmo)/2;
+    double frictionY = -(coef_frottements * player_speed * player.m_speedY * masse_volumique_atmo)/2;
 
     // if a key is pressed, we add propulsion
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
     {
         player.m_speedX -= (propulsion/mass) * delta_t_sec;
     }
-
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
     {
         player.m_speedX += (propulsion/mass) * delta_t_sec;
     }
-
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
     {
         player.m_speedY -= (propulsion/mass) * delta_t_sec;
     }
-
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
     {
         player.m_speedY += (propulsion/mass) * delta_t_sec;
     }
 
     // whether or not a key is pressed, we compute new speed without propulsion
-    if (player.m_speedX < 0)
-    {
-        player.m_speedX -= ((get_forcesX() - frictionX)/ mass) * delta_t_sec;
-    } else {
-        player.m_speedX += ((get_forcesX() - frictionX)/ mass) * delta_t_sec;
-    }
-
-    if (player.m_speedY < 0)
-    {
-        player.m_speedY -= ((get_forcesY() - frictionY)/ mass) * delta_t_sec;
-    } else {
-        player.m_speedY += ((get_forcesY() - frictionY)/ mass) * delta_t_sec;
-    }
+    player.m_speedX += ((get_forcesX() + frictionX)/ mass) * delta_t_sec;
+    player.m_speedY += ((get_forcesY() + frictionY)/ mass) * delta_t_sec;
 
     player.m_posX += player.m_speedX * delta_t_sec;
     player.m_posY += player.m_speedY * delta_t_sec;
+
+    sf::Vector2u screen_res = _window.getSize();
+
+	//calculate the limits of the player's position based on the screen size and zoom factor
+    double xMax = (screen_res.x / 2.0) / zoom_factor - radius;
+    double xMin = -xMax;
+
+    double yMax = (screen_res.y / 2.0) / zoom_factor - radius;
+    double yMin = -yMax;
+
+	//check if the player is out of bounds and adjust position and speed accordingly
+    if (playerX > xMax) {
+        playerX = xMax;               
+        player_speedX = -player_speedX;
+    }
+    else if (playerX < xMin) {
+        playerX = xMin;
+        player_speedX = -player_speedX;
+    }
+
+    if (playerY > yMax) {
+        playerY = yMax;
+        player_speedY = -player_speedY;
+    }
+    else if (playerY < yMin) {
+        playerY = yMin;
+        player_speedY = -player_speedY;
+    }
 
     // used by render() to rotate the sprite
     double deltaX = player.m_posX - playerbeforeX;
