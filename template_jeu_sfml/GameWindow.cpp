@@ -251,22 +251,22 @@ void GameWindow::update()
     double yMin = -yMax;
 
 	//check if the player is out of bounds and adjust position and speed accordingly
-    if (playerX > xMax) {
-        playerX = xMax;               
-        player_speedX = -player_speedX;
+    if (player.m_posX > xMax) {
+        player.m_posX = xMax;               
+        player.m_speedX = -player.m_speedX;
     }
-    else if (playerX < xMin) {
-        playerX = xMin;
-        player_speedX = -player_speedX;
+    else if (player.m_posX < xMin) {
+        player.m_posX = xMin;
+        player.m_speedX = -player.m_speedX;
     }
 
-    if (playerY > yMax) {
-        playerY = yMax;
-        player_speedY = -player_speedY;
+    if (player.m_posY > yMax) {
+        player.m_posY = yMax;
+        player.m_speedY = -player.m_speedY;
     }
-    else if (playerY < yMin) {
-        playerY = yMin;
-        player_speedY = -player_speedY;
+    else if (player.m_posY < yMin) {
+        player.m_posY = yMin;
+        player.m_speedY = -player.m_speedY;
     }
 
     // used by render() to rotate the sprite

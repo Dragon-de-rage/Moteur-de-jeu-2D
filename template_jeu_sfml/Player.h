@@ -24,7 +24,7 @@ public:
 
 	double m_angle;
 
-	std::optional<sf::Sprite> Entity::m_sprite;
+	
 
 	/*double getPosX() const;
 	double getPosY() const;*/
