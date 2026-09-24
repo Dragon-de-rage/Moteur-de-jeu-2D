@@ -17,9 +17,11 @@ public:
 
 	[[nodiscard]] bool isColliding(const Entity& other) const;
 
+	std::optional<sf::Sprite> m_sprite;
+
 private:
 	sf::Texture m_texture;
-	std::optional<sf::Sprite> m_sprite;
+	
 
 protected:
 	std::string m_textureFile;

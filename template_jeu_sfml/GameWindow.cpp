@@ -281,33 +281,35 @@ void GameWindow::update()
     double yMin = -yMax;
 
 	//check if the player is out of bounds and adjust position and speed accordingly
-    if (playerX > xMax) {
-        double oldX = playerX - player_speedX * delta_t_sec;
+    if (player.m_posX > xMax) {
+        player.m_posX = xMax;               
+        player.m_speedX = -player.m_speedX;
+      
+        double oldX = player.m_posX - player.m_speedX * delta_t_sec;
         double timeToCollision = (xMax - oldX) / player_speedX;
         double remainingTime = delta_t_sec - timeToCollision;
-
-        playerX = xMax;
-        player_speedX = -player_speedX;
-
-        playerX += player_speedX * remainingTime;
+      
+        player.m_posX += player.m_speedX * remainingTime;
     }
-    else if (playerX < xMin) {
-        double oldX = playerX - player_speedX * delta_t_sec;
-        double timeToCollision = (xMin - oldX) / player_speedX;
+    else if (player.m_posX < xMin) {
+        player.m_posX = xMin;
+        player.m_speedX = -player.m_speedX;
+      
+        double oldX = player.m_posX - player.m_speedX * delta_t_sec;
+        double timeToCollision = (xMin - oldX) / player.m_speedX;
         double remainingTime = delta_t_sec - timeToCollision;
+      
+        player.m_posX += player.m_speedX * remainingTime;
 
-        playerX = xMin;
-        player_speedX = -player_speedX;
-        playerX += player_speedX * remainingTime;
     }
 
-    if (playerY > yMax) {
-        playerY = yMax;
-        player_speedY = -player_speedY;
+    if (player.m_posY > yMax) {
+        player.m_posY = yMax;
+        player.m_speedY = -player.m_speedY;
     }
-    else if (playerY < yMin) {
-        playerY = yMin;
-        player_speedY = -player_speedY;
+    else if (player.m_posY < yMin) {
+        player.m_posY = yMin;
+        player.m_speedY = -player.m_speedY;
     }
 
     // used by render() to rotate the sprite
