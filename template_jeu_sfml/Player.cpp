@@ -1,4 +1,4 @@
-#include "player.h"
+#include "Player.h"
 
 Player::Player(double x, double y)
 	: m_posX(x), m_posY(y), m_angle(0.0), m_speedX(0.0), m_speedY(0.0)

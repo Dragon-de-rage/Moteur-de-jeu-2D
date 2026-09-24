@@ -8,7 +8,7 @@
 #include <array>
 #include <optional>
 #include "Entity.h"
-#include "player.h"
+#include "Player.h"
 
 using ScreenPoint = std::pair<int, int>;
 using WorldPoint = std::pair<double, double>;
