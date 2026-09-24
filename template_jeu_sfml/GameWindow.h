@@ -46,7 +46,8 @@ public:
     // constantes (plus tard paramétrable dans moteur)
 
     double propulsion = 100000.0;
-    double coef_frottements = 5.0;
+    //double coef_frottements = 5.0;
+	double coef_frottements = 0; 
     double masse_volumique_atmo = 1.225;
 
     // Player mass (in kilograms)
