@@ -145,10 +145,10 @@ void GameWindow::render()
     static bool fontLoaded = font.openFromFile("arial.ttf"); 
 
 
-    double v = std::sqrt(player_speedX * player_speedX + player_speedY * player_speedY);
+    double v = std::sqrt(player.m_speedX * player.m_speedX + player.m_speedY * player.m_speedY);
     double g = gravity[1];
     double energieCinetique = 0.5 * mass * v * v /1000;
-    double energiePotentielle = mass * g * -playerY / 1000;
+    double energiePotentielle = mass * g * - player.m_posY / 1000;
     double energieTotale = energieCinetique + energiePotentielle;
 
     if (fontLoaded) {
