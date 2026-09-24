@@ -20,7 +20,7 @@ include_directories(".")
 #list(APPEND CMAKE_MODULE_PATH "/home/dragon-de-rage/SFML-3.1.0-linux-gcc-64-bit/SFML-3.1.0/lib/cmake")
 #find_package(SFML 3.1 REQUIRED COMPONENTS Graphics Window System)
 
-add_executable(R5A12 main.cpp GameWindow.cpp GameWindow.h player.cpp player.h Entity.cpp Entity.h)
+add_executable(R5A12 main.cpp GameWindow.cpp GameWindow.h Player.cpp Player.h Entity.cpp Entity.h)
 target_link_libraries(R5A12 sfml-graphics sfml-window sfml-system)
 
 
