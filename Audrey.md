@@ -92,3 +92,13 @@ Restructuration de *GameWindow* pour introduire *Entity* et ajout de la classe f
 J'ai eu des difficulter à adapter le code existant pour sortir le *player* de *GameWindow* et en faire une classe fonctionel sans rien perdre.
 
 Je n'ai pas encore fini l'intégration.
+
+## Cours du 22/09/26
+
+Débugage de la refactorisation, j'ai eu les mêmes problème que la séance dernière.
+
+## Cours du 24/09/26
+
+J'ai encore travaillé sur l'intégration de *Entity* et *Player* dans le code existant. J'ai commencé à travailler sur l'intégration des touches réglable (pour les déplacements d'un ou plusieurs joueurs).
+
+J'ai également mis à jour le fichier *CMakeList* afin qu'il incluse *Entity* et *Player* afin qu'ils soient pris en compte dans la solution.
