@@ -286,7 +286,7 @@ void GameWindow::update()
         player.m_speedX = -player.m_speedX;
       
         double oldX = player.m_posX - player.m_speedX * delta_t_sec;
-        double timeToCollision = (xMax - oldX) / player_speedX;
+        double timeToCollision = (xMax - oldX) / player.m_speedX;
         double remainingTime = delta_t_sec - timeToCollision;
       
         player.m_posX += player.m_speedX * remainingTime;
