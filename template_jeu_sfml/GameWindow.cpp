@@ -5,7 +5,15 @@
 GameWindow::GameWindow()
 {
     //!\\ Instancier le joueur
-	player = Player(0.0, 0.0);
+	player = new Player(0.0, 0.0);
+
+	std::string backgroundImagePath = "Images/space-background.jpg";
+	if (backgroundTexture.loadFromFile(backgroundImagePath)) {
+		backgroundSprite.emplace(backgroundTexture);
+	}
+	else {
+		std::cout << "Erreur lors du chargement de l'image de fond : " << backgroundImagePath << std::endl;
+	}
 }
 
 ScreenPoint toScreen(const WorldPoint& point, int W, int H, double z)
@@ -133,8 +141,8 @@ void GameWindow::render()
 	double dt = compute_delta_t(); // time between two frames in seconds
 
 	//!\\ TODO: Changer playerX et playerY avec les proprétés de l'objet Player
-    double deltaX = player.m_posX - playerbeforeX;
-    double deltaY = player.m_posY - playerbeforeY;
+    double deltaX = player->m_posX - playerbeforeX;
+    double deltaY = player->m_posY - playerbeforeY;
 
 
 	double distance = std::sqrt(deltaX * deltaX + deltaY * deltaY);
@@ -145,10 +153,10 @@ void GameWindow::render()
     static bool fontLoaded = font.openFromFile("arial.ttf"); 
 
 
-    double v = std::sqrt(player.m_speedX * player.m_speedX + player.m_speedY * player.m_speedY);
+    double v = std::sqrt(player->m_speedX * player->m_speedX + player->m_speedY * player->m_speedY);
     double g = gravity[1];
     double energieCinetique = 0.5 * mass * v * v /1000;
-    double energiePotentielle = mass * g * - player.m_posY / 1000;
+    double energiePotentielle = mass * g * - player->m_posY / 1000;
     double energieTotale = energieCinetique + energiePotentielle;
 
     if (fontLoaded) {
@@ -195,24 +203,24 @@ void GameWindow::render()
     //zoom factor
     double z = 1.0; // Adjust this value to change the zoom level
     //player position in screen coordinates
-    WorldPoint playerPosition = { player.m_posX, player.m_posY };
+    WorldPoint playerPosition = { player->m_posX, player->m_posY };
 
     // Convert player position to screen coordinates
     ScreenPoint playerScreenPosition = toScreen(playerPosition, screen_res.x, screen_res.y, zoom_factor);
 
 
 	//!\\ TODO: Changer playerSprite et playerTexture avec les proprétés de l'objet Player
-    if (player.m_sprite)
+    if (player->m_sprite)
     {
 
         // to adjust according to the base rotation we want (90 = UP)
         constexpr float ROTATION_OFFSET = 90.f;
 
-        player.m_sprite->setRotation(sf::degrees(player.m_angle + ROTATION_OFFSET));
+        player->m_sprite->setRotation(sf::degrees(player->m_angle + ROTATION_OFFSET));
 
-        player.m_sprite->setPosition(sf::Vector2f(playerScreenPosition.first, playerScreenPosition.second));
+        player->m_sprite->setPosition(sf::Vector2f(playerScreenPosition.first, playerScreenPosition.second));
 
-        _window.draw(*player.m_sprite);
+        _window.draw(*player->m_sprite);
     }
     else
     {
@@ -232,8 +240,8 @@ void GameWindow::render()
 void GameWindow::update()
 {
 	//!\\ TODO: Changer playerX et playerY avec les proprétés de l'objet Player
-	playerbeforeX = player.m_posX;
-    playerbeforeY = player.m_posY;
+	playerbeforeX = player->m_posX;
+    playerbeforeY = player->m_posY;
 
 	double delta_t_sec = compute_delta_t();
 
@@ -241,35 +249,35 @@ void GameWindow::update()
     // compute friction due to current speed to apply its reduction to the next move
 
     //Ff,x​= −kvvx ; Ff,y​= −kvvy
-    double player_speed = std::sqrt(player.m_speedX * player.m_speedX + player.m_speedY * player.m_speedY);
+    double player_speed = std::sqrt(player->m_speedX * player->m_speedX + player->m_speedY * player->m_speedY);
     // double friction = compute_friction(player_speed);
-    double frictionX = -(coef_frottements * player_speed * player.m_speedX * masse_volumique_atmo)/2;
-    double frictionY = -(coef_frottements * player_speed * player.m_speedY * masse_volumique_atmo)/2;
+    double frictionX = -(coef_frottements * player_speed * player->m_speedX * masse_volumique_atmo)/2;
+    double frictionY = -(coef_frottements * player_speed * player->m_speedY * masse_volumique_atmo)/2;
 
     // if a key is pressed, we add propulsion
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
     {
-        player.m_speedX -= (propulsion/mass) * delta_t_sec;
+        player->m_speedX -= (propulsion/mass) * delta_t_sec;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
     {
-        player.m_speedX += (propulsion/mass) * delta_t_sec;
+        player->m_speedX += (propulsion/mass) * delta_t_sec;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
     {
-        player.m_speedY -= (propulsion/mass) * delta_t_sec;
+        player->m_speedY -= (propulsion/mass) * delta_t_sec;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
     {
-        player.m_speedY += (propulsion/mass) * delta_t_sec;
+        player->m_speedY += (propulsion/mass) * delta_t_sec;
     }
 
     // whether or not a key is pressed, we compute new speed without propulsion
-    player.m_speedX += ((get_forcesX() + frictionX)/ mass) * delta_t_sec;
-    player.m_speedY += ((get_forcesY() + frictionY)/ mass) * delta_t_sec;
+    player->m_speedX += ((get_forcesX() + frictionX)/ mass) * delta_t_sec;
+    player->m_speedY += ((get_forcesY() + frictionY)/ mass) * delta_t_sec;
 
-    player.m_posX += player.m_speedX * delta_t_sec;
-    player.m_posY += player.m_speedY * delta_t_sec;
+    player->m_posX += player->m_speedX * delta_t_sec;
+    player->m_posY += player->m_speedY * delta_t_sec;
 
     sf::Vector2u screen_res = _window.getSize();
 
@@ -281,40 +289,40 @@ void GameWindow::update()
     double yMin = -yMax;
 
 	//check if the player is out of bounds and adjust position and speed accordingly
-    if (player.m_posX > xMax) {
-        player.m_posX = xMax;               
-        player.m_speedX = -player.m_speedX;
+    if (player->m_posX > xMax) {
+        player->m_posX = xMax;               
+        player->m_speedX = -player->m_speedX;
       
-        double oldX = player.m_posX - player.m_speedX * delta_t_sec;
-        double timeToCollision = (xMax - oldX) / player.m_speedX;
+        double oldX = player->m_posX - player->m_speedX * delta_t_sec;
+        double timeToCollision = (xMax - oldX) / player->m_speedX;
         double remainingTime = delta_t_sec - timeToCollision;
       
-        player.m_posX += player.m_speedX * remainingTime;
+        player->m_posX += player->m_speedX * remainingTime;
     }
-    else if (player.m_posX < xMin) {
-        player.m_posX = xMin;
-        player.m_speedX = -player.m_speedX;
+    else if (player->m_posX < xMin) {
+        player->m_posX = xMin;
+        player->m_speedX = -player->m_speedX;
       
-        double oldX = player.m_posX - player.m_speedX * delta_t_sec;
-        double timeToCollision = (xMin - oldX) / player.m_speedX;
+        double oldX = player->m_posX - player->m_speedX * delta_t_sec;
+        double timeToCollision = (xMin - oldX) / player->m_speedX;
         double remainingTime = delta_t_sec - timeToCollision;
       
-        player.m_posX += player.m_speedX * remainingTime;
+        player->m_posX += player->m_speedX * remainingTime;
 
     }
 
-    if (player.m_posY > yMax) {
-        player.m_posY = yMax;
-        player.m_speedY = -player.m_speedY;
+    if (player->m_posY > yMax) {
+        player->m_posY = yMax;
+        player->m_speedY = -player->m_speedY;
     }
-    else if (player.m_posY < yMin) {
-        player.m_posY = yMin;
-        player.m_speedY = -player.m_speedY;
+    else if (player->m_posY < yMin) {
+        player->m_posY = yMin;
+        player->m_speedY = -player->m_speedY;
     }
 
     // used by render() to rotate the sprite
-    double deltaX = player.m_posX - playerbeforeX;
-    double deltaY = player.m_posY - playerbeforeY;
+    double deltaX = player->m_posX - playerbeforeX;
+    double deltaY = player->m_posY - playerbeforeY;
     double moveDistance = std::sqrt(deltaX * deltaX + deltaY * deltaY);
 
     const double MOVE_THRESHOLD = 0.001;
@@ -323,6 +331,6 @@ void GameWindow::update()
     {
         constexpr double PI = 3.14159265358979323846;
 		//!\\ TODO: Changer playerAngleDeg avec les proprétés de l'objet Player
-        player.m_angle = static_cast<float>(std::atan2(deltaY, deltaX) * 180.0 / PI);
+        player->m_angle = static_cast<float>(std::atan2(deltaY, deltaX) * 180.0 / PI);
     }
 }

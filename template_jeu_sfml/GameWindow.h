@@ -8,7 +8,7 @@
 #include <array>
 #include <optional>
 #include "Entity.h"
-#include "Player.h"
+#include "player.h"
 
 using ScreenPoint = std::pair<int, int>;
 using WorldPoint = std::pair<double, double>;
@@ -42,7 +42,7 @@ public:
     // Forces applied to characters
     // They are either const or vectors, X and Y norms are in Newtons
     // Use get_forcesX() and ...Y() function to get all the forces applied on one axis
-    std::array<double, 2> gravity = {0.0, 9.80665};
+    std::array<double, 2> gravity = {0.0, /*9.80665*/100.0};
     // constantes (plus tard paramétrable dans moteur)
 
     double propulsion = 100000.0;
@@ -64,7 +64,7 @@ private:
 
     sf::RenderWindow _window;
 
-	Player player;
+	Player *player = nullptr;
 
     // Texture et sprite utilisés pour afficher le fond fixe
     sf::Texture backgroundTexture;

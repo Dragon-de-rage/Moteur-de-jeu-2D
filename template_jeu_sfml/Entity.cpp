@@ -1,11 +1,14 @@
 #include "Entity.h"
+#include <iostream>
 
-void Entity::setTexture(const std::string& textureFile)
+void Entity::setTexture()
 {
-    if (m_texture.loadFromFile(textureFile)) {
+    if (m_texture.loadFromFile(m_textureFile)) {
         m_sprite.emplace(m_texture);
         // Centrer l'origine en utilisant getLocalBounds()
+		m_sprite->setScale(sf::Vector2f(0.1f, 0.1f)); // Ajustez le facteur d'échelle selon vos besoins)
         auto bounds = m_sprite->getLocalBounds();
         m_sprite->setOrigin(sf::Vector2f(bounds.size.x / 2.f, bounds.size.y / 2.f));
     }
+	std::cout << "Sprite : " << m_sprite.has_value() << std::endl;
 }

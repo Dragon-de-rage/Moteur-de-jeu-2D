@@ -15,7 +15,6 @@ public:
 	Player(double x = 0.0, double y = 0.0);
 
 	void update(float deltaTime) override;
-	void render(sf::RenderWindow& window) override;
 
 	double m_posX;
 	double m_posY;
@@ -28,9 +27,6 @@ public:
 
 	/*double getPosX() const;
 	double getPosY() const;*/
-
-private:
-	std::string Entity::m_textureFile = "Images/animal_linux_penguin_2598.png";
 
 
 };
