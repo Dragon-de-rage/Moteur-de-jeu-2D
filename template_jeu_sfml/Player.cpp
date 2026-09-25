@@ -19,6 +19,23 @@ void Player::update(float deltaTime)
 	}
 }
 
+void Player::setKeyBinding(const KeyBinding& binding)
+{
+	m_keyBinding = binding;
+}
+
+void Player::setKey(PlayerAction action, sf::Keyboard::Key key)
+{	
+	m_keyBinding[action] = key;
+}
+
+bool Player::isKeyPressed(PlayerAction action)
+{
+	if (!m_keyBinding.contains(action))
+		return false;
+	return sf::Keyboard::isKeyPressed(m_keyBinding.at(action));
+}
+
 //double Player::getPosX() const
 //{
 //	return m_posX;

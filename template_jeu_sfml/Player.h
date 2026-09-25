@@ -8,6 +8,7 @@
 #include <SFML/Graphics.hpp>
 #include <optional>
 #include <chrono>
+#include "PlayerAction.h"
 
 class Player : public Entity
 {
@@ -23,12 +24,20 @@ public:
 
 	double m_angle;
 
-	
+	// Set each player's key binding
+	void setKeyBinding(const KeyBinding& binding);
+
+	// Set each keys
+	void setKey(PlayerAction action, sf::Keyboard::Key key);
 
 	/*double getPosX() const;
 	double getPosY() const;*/
 
+private:
+	bool isKeyPressed(PlayerAction action);
+	
 
+	KeyBinding m_keyBinding;
 };
 
 #endif // !PLAYER_H
