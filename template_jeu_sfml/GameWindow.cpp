@@ -13,7 +13,7 @@ GameWindow::GameWindow()
 	}
 	else {
 		std::cout << "Erreur lors du chargement de l'image de fond : " << backgroundImagePath << std::endl;
-	}
+    }
 }
 
 ScreenPoint toScreen(const WorldPoint& point, int W, int H, double z)
@@ -59,9 +59,138 @@ double GameWindow::compute_delta_t()
     return delta_t.count();
 }
 
+void GameWindow::compute_border_collision()
+{
+    //calculate the limits of the player's position based on the screen size and zoom factor
+    double xMax = (screen_res.x / 2.0) / zoom_factor - radius;
+    double xMin = -xMax;
+
+    double yMax = (screen_res.y / 2.0) / zoom_factor - radius;
+    double yMin = -yMax;
+
+    //check if the player is out of bounds and adjust position and speed accordingly
+    if (player->m_posX > xMax) {
+        double oldX = player->m_posX - player->m_speedX * current_dt;
+        double timeToCollision = (xMax - oldX) / player->m_speedX;
+        double remainingTime = current_dt - timeToCollision;
+
+        player->m_speedX = -player->m_speedX;
+
+        player->m_posX = xMax + (player->m_speedX * remainingTime);
+    }
+    else if (player->m_posX < xMin) {
+        double oldX = player->m_posX - player->m_speedX * current_dt;
+        double timeToCollision = (xMin - oldX) / player->m_speedX;
+        double remainingTime = current_dt - timeToCollision;
+
+        player->m_speedX = -player->m_speedX;
+
+        player->m_posX = xMin + (player->m_speedX * remainingTime);
+    }
+
+    if (player->m_posY > yMax) {
+        double oldY = player->m_posY - player->m_speedY * current_dt;
+        double timeToCollision = (yMax - oldY) / player->m_speedY;
+        double remainingTime = current_dt - timeToCollision;
+
+        player->m_speedY = -player->m_speedY;
+
+        player->m_posY= player->m_posY + (player->m_speedY * remainingTime);
+    }
+    else if (player->m_posY < yMin) {
+        double oldY = player->m_posY - player->m_speedY * current_dt;
+        double timeToCollision = (yMin - oldY) / player->m_speedY;
+        double remainingTime = current_dt - timeToCollision;
+
+        player->m_speedY = -player->m_speedY;
+
+        player->m_posY = player->m_posY + (player->m_speedY * remainingTime);
+    }
+}
+
+void GameWindow::render_debug()
+{
+    // Debug : draw axes
+    float y = screen_res.y; // because screen_res.y is an uint
+    sf::RectangleShape axe_x(sf::Vector2f(screen_res.x, 1));
+    sf::RectangleShape axe_y(sf::Vector2f(1, -y));
+    axe_x.setFillColor(sf::Color::Red);
+    axe_y.setFillColor(sf::Color::Red);
+    axe_x.setPosition(sf::Vector2f(screen_res.x / 2, screen_res.y / 2));
+    axe_y.setPosition(sf::Vector2f(screen_res.x / 2, screen_res.y / 2));
+    _window.draw(axe_x);
+    _window.draw(axe_y);
+    // draws graduations each 10 pixels
+    sf::RectangleShape graduation(sf::Vector2f(1, 10));
+    graduation.setFillColor(sf::Color::Red);
+    for (size_t i = 10; i < screen_res.x / 2; i += 10) { // on x axis
+        graduation.setPosition(sf::Vector2f(screen_res.x / 2 + i, screen_res.y / 2 - 5));
+        _window.draw(graduation);
+    }
+    graduation.setSize(sf::Vector2f(10, 1));
+    for (size_t i = 10; i < screen_res.y / 2; i += 10) { // on x axis
+        graduation.setPosition(sf::Vector2f(screen_res.x / 2 - 5, screen_res.y / 2 - i));
+        _window.draw(graduation);
+    }
+
+    double deltaX = player->m_posX - playerbeforeX;
+    double deltaY = player->m_posY - playerbeforeY;
+
+    double distance = std::sqrt(deltaX * deltaX + deltaY * deltaY);
+    double vitesse = distance / current_dt; // speed = distance / time
+
+    static sf::Font font;
+    static bool fontLoaded = font.openFromFile("arial.ttf");
+
+    double v = std::sqrt(player->m_speedX * player->m_speedX + player->m_speedY * player->m_speedY);
+    double g = gravity[1];
+    double energieCinetique = 0.5 * mass * v * v;
+    double energiePotentielle = mass * g * -player->m_posY;
+    double energieTotale = energieCinetique + energiePotentielle;
+
+    if (fontLoaded) {
+        sf::Text textVitesse(font);
+        textVitesse.setCharacterSize(18);
+        textVitesse.setFillColor(sf::Color::Red);
+        textVitesse.setPosition(sf::Vector2f(10.f, 10.f));
+        textVitesse.setString("Speed : " + std::to_string(vitesse) + " units/sec");
+
+        sf::Text textEnergieCinetique(font);
+        textEnergieCinetique.setCharacterSize(18);
+        textEnergieCinetique.setFillColor(sf::Color::Red);
+        textEnergieCinetique.setPosition(sf::Vector2f(10.f, 30.f));
+        textEnergieCinetique.setString("Energie Cinetique : " + std::to_string(energieCinetique) + " J");
+
+        sf::Text textEnergiePotentielle(font);
+        textEnergiePotentielle.setCharacterSize(18);
+        textEnergiePotentielle.setFillColor(sf::Color::Red);
+        textEnergiePotentielle.setPosition(sf::Vector2f(10.f, 50.f));
+        textEnergiePotentielle.setString("Energie Potentielle : " + std::to_string(energiePotentielle) + " J");
+
+        sf::Text textEnergieTotale(font);
+        textEnergieTotale.setCharacterSize(18);
+        textEnergieTotale.setFillColor(sf::Color::Red);
+        textEnergieTotale.setPosition(sf::Vector2f(10.f, 70.f));
+        textEnergieTotale.setString("Energie Totale : " + std::to_string(energieTotale) + " J");
+
+        _window.draw(textVitesse);
+        _window.draw(textEnergieCinetique);
+        _window.draw(textEnergiePotentielle);
+        _window.draw(textEnergieTotale);
+    }
+    else {
+        std::cout << "Speed : " << vitesse << " units/sec" << std::endl;
+        std::cout << "Energie Cinetique : " << energieCinetique << " MJ" << std::endl;
+        std::cout << "Energie Potentielle : " << energiePotentielle << " MJ" << std::endl;
+        std::cout << "Energie Totale : " << energieTotale << " MJ" << std::endl;
+    } // Print in console if font is not loaded
+}
+
 void GameWindow::show(int width, int height, const std::string& title)
 {
     _window.create(sf::VideoMode(sf::Vector2u(width, height)), title);
+
+    screen_res = _window.getSize();
 
     while (_window.isOpen())
     {
@@ -108,93 +237,15 @@ void GameWindow::render()
 {
     // Clear background with White color.
     _window.clear(sf::Color::White);
-    sf::Vector2u screen_res = _window.getSize();
 
     // Draw background
-    backgroundSprite->setScale(sf::Vector2f(screen_res.x / backgroundSprite->getLocalBounds().size.x,
-        screen_res.y / backgroundSprite->getLocalBounds().size.y));
-    _window.draw(*backgroundSprite);
+    if (backgroundSprite) {
+        backgroundSprite->setScale(sf::Vector2f(screen_res.x / backgroundSprite->getLocalBounds().size.x,
+            screen_res.y / backgroundSprite->getLocalBounds().size.y));
+        _window.draw(*backgroundSprite);
+    }
 #ifdef SFML_DEBUG // if in debug, prints the axis
-    // Debug : draw axes
-    float y = screen_res.y; // because screen_res.y is an uint
-    sf::RectangleShape axe_x(sf::Vector2f(screen_res.x, 1));
-    sf::RectangleShape axe_y(sf::Vector2f(1, -y));
-    axe_x.setFillColor(sf::Color::Red);
-    axe_y.setFillColor(sf::Color::Red);
-    axe_x.setPosition(sf::Vector2f(screen_res.x / 2, screen_res.y / 2));
-    axe_y.setPosition(sf::Vector2f(screen_res.x / 2, screen_res.y / 2));
-    _window.draw(axe_x);
-    _window.draw(axe_y);
-    // draws graduations each 10 pixels
-    sf::RectangleShape graduation(sf::Vector2f(1, 10));
-    graduation.setFillColor(sf::Color::Red);
-    for (size_t i = 10; i < screen_res.x / 2; i += 10) { // on x axis
-        graduation.setPosition(sf::Vector2f(screen_res.x / 2 + i, screen_res.y / 2 - 5));
-        _window.draw(graduation);
-    }
-    graduation.setSize(sf::Vector2f(10, 1));
-    for (size_t i = 10; i < screen_res.y / 2; i += 10) { // on x axis
-        graduation.setPosition(sf::Vector2f(screen_res.x / 2 - 5, screen_res.y / 2 - i));
-        _window.draw(graduation);
-    }
-
-
-    double dt = current_dt; // time between two frames in seconds
-
-    double deltaX = player->m_posX - playerbeforeX;
-    double deltaY = player->m_posY - playerbeforeY;
-
-
-	double distance = std::sqrt(deltaX * deltaX + deltaY * deltaY);
-
-	double vitesse = distance / dt; // speed = distance / time
-
-    static sf::Font font;
-    static bool fontLoaded = font.openFromFile("arial.ttf"); 
-
-    double v = std::sqrt(player->m_speedX * player->m_speedX + player->m_speedY * player->m_speedY);
-    double g = gravity[1];
-    double energieCinetique = 0.5 * mass * v * v;
-    double energiePotentielle = mass * g * -player->m_posY;
-    double energieTotale = energieCinetique + energiePotentielle;
-
-    if (fontLoaded) {
-        sf::Text textVitesse(font);
-        textVitesse.setCharacterSize(18);
-        textVitesse.setFillColor(sf::Color::Red);
-        textVitesse.setPosition(sf::Vector2f(10.f, 10.f));
-        textVitesse.setString("Speed : " + std::to_string(vitesse) + " units/sec");
-
-		sf::Text textEnergieCinetique(font);
-		textEnergieCinetique.setCharacterSize(18);
-		textEnergieCinetique.setFillColor(sf::Color::Red);
-		textEnergieCinetique.setPosition(sf::Vector2f(10.f, 30.f));
-		textEnergieCinetique.setString("Energie Cinetique : " + std::to_string(energieCinetique) + " J");
-
-		sf::Text textEnergiePotentielle(font);
-		textEnergiePotentielle.setCharacterSize(18);
-		textEnergiePotentielle.setFillColor(sf::Color::Red);
-		textEnergiePotentielle.setPosition(sf::Vector2f(10.f, 50.f));
-		textEnergiePotentielle.setString("Energie Potentielle : " + std::to_string(energiePotentielle) + " J");
-
-		sf::Text textEnergieTotale(font);
-		textEnergieTotale.setCharacterSize(18);
-		textEnergieTotale.setFillColor(sf::Color::Red);
-		textEnergieTotale.setPosition(sf::Vector2f(10.f, 70.f));
-		textEnergieTotale.setString("Energie Totale : " + std::to_string(energieTotale) + " J");
-
-        _window.draw(textVitesse);
-        _window.draw(textEnergieCinetique);
-        _window.draw(textEnergiePotentielle);
-        _window.draw(textEnergieTotale);
-    }
-    else { 
-        std::cout << "Speed : " << vitesse << " units/sec" << std::endl; 
-		std::cout << "Energie Cinetique : " << energieCinetique << " MJ" << std::endl;
-		std::cout << "Energie Potentielle : " << energiePotentielle << " MJ" << std::endl;
-		std::cout << "Energie Totale : " << energieTotale << " MJ" << std::endl;
-    } // Print in console if font is not loaded
-
+    render_debug();
 #endif
     // Draw player
     int radius = 10;
@@ -240,93 +291,38 @@ void GameWindow::update()
 	playerbeforeX = player->m_posX;
     playerbeforeY = player->m_posY;
 
-    double delta_t_sec = current_dt;
-
     //Ff,x​= −kvvx ; Ff,y​= −kvvy
-    double player_speed = std::sqrt(player->m_speedX * player->m_speedX + player->m_speedY * player->m_speedY);
+    player->compute_speed();
     // double friction = compute_friction(player_speed);
-    double frictionX = -(coef_frottements * player_speed * player->m_speedX * masse_volumique_atmo)/2;
-    double frictionY = -(coef_frottements * player_speed * player->m_speedY * masse_volumique_atmo)/2;
+    double frictionX = -(coef_frottements * player->m_speed * player->m_speedX * masse_volumique_atmo)/2;
+    double frictionY = -(coef_frottements * player->m_speed * player->m_speedY * masse_volumique_atmo)/2;
 
     // if a key is pressed, we add propulsion
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
     {
-        player->m_speedX -= (propulsion/mass) * delta_t_sec;
+        player->m_speedX -= (propulsion/mass) * current_dt;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
     {
-        player->m_speedX += (propulsion/mass) * delta_t_sec;
+        player->m_speedX += (propulsion/mass) * current_dt;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
     {
-        player->m_speedY -= (propulsion/mass) * delta_t_sec;
+        player->m_speedY -= (propulsion/mass) * current_dt;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
     {
-        player->m_speedY += (propulsion/mass) * delta_t_sec;
+        player->m_speedY += (propulsion/mass) * current_dt;
     }
 
     // whether or not a key is pressed, we compute new speed without propulsion
-    player->m_speedX += ((get_forcesX() + frictionX)/ mass) * delta_t_sec;
-    player->m_speedY += ((get_forcesY() + frictionY)/ mass) * delta_t_sec;
+    player->m_speedX += ((get_forcesX() + frictionX)/ mass) * current_dt;
+    player->m_speedY += ((get_forcesY() + frictionY)/ mass) * current_dt;
 
-    player->m_posX += player->m_speedX * delta_t_sec;
-    player->m_posY += player->m_speedY * delta_t_sec;
+    player->m_posX += player->m_speedX * current_dt;
+    player->m_posY += player->m_speedY * current_dt;
 
-    sf::Vector2u screen_res = _window.getSize();
-
-	//calculate the limits of the player's position based on the screen size and zoom factor
-    double xMax = (screen_res.x / 2.0) / zoom_factor - radius;
-    double xMin = -xMax;
-
-    double yMax = (screen_res.y / 2.0) / zoom_factor - radius;
-    double yMin = -yMax;
-
-	//check if the player is out of bounds and adjust position and speed accordingly
-    if (player->m_posX > xMax) {
-        double oldX = player->m_posX - player->m_speedX * delta_t_sec;
-        double timeToCollision = (xMax - oldX) / player->m_speedX;
-        double remainingTime = delta_t_sec - timeToCollision;
-
-        player->m_speedX = -player->m_speedX;
-
-        player->m_posX = xMax + (player->m_speedX * remainingTime);
-    }
-    else if (player->m_posX < xMin) {
-        
-      
-        double oldX = player->m_posX - player->m_speedX * delta_t_sec;
-        double timeToCollision = (xMin - oldX) / player->m_speedX;
-        double remainingTime = delta_t_sec - timeToCollision;
-
-        player->m_speedX = -player->m_speedX;
-      
-        player->m_posX = xMin + (player->m_speedX * remainingTime);
-
-    }
-
-    if (player->m_posY > yMax) {
-        
-
-        double oldY = player->m_posY - player->m_speedY * delta_t_sec;
-        double timeToCollision = (yMax - oldY) / player->m_speedY;
-        double remainingTime = delta_t_sec - timeToCollision;
-
-        player->m_speedY = -player->m_speedY;
-
-        player->m_posY= player->m_posY + (player->m_speedY * remainingTime);
-    }
-    else if (player->m_posY < yMin) {
-       
-
-		double oldY = player->m_posY - player->m_speedY * delta_t_sec;
-		double timeToCollision = (yMin - oldY) / player->m_speedY;
-		double remainingTime = delta_t_sec - timeToCollision;
-
-        player->m_speedY = -player->m_speedY;
-
-		player->m_posY = player->m_posY + (player->m_speedY * remainingTime);
-    }
+    compute_border_collision();
 
     // used by render() to rotate the sprite
     double deltaX = player->m_posX - playerbeforeX;

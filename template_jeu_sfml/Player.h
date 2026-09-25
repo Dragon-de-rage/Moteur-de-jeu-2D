@@ -4,10 +4,7 @@
 #define PLAYER_H
 
 #include "Entity.h"
-#include <iostream>
 #include <SFML/Graphics.hpp>
-#include <optional>
-#include <chrono>
 
 class Player : public Entity
 {
@@ -18,6 +15,7 @@ public:
 
 	double m_posX;
 	double m_posY;
+    double m_speed; // norme de la vitesse
 	double m_speedX;
 	double m_speedY;
 
@@ -27,7 +25,7 @@ public:
 
 	/*double getPosX() const;
 	double getPosY() const;*/
-
+    void compute_speed();
 
 };
 

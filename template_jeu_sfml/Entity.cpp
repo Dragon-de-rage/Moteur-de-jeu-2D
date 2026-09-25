@@ -1,5 +1,4 @@
 #include "Entity.h"
-#include <iostream>
 
 void Entity::setTexture()
 {
@@ -10,5 +9,4 @@ void Entity::setTexture()
         auto bounds = m_sprite->getLocalBounds();
         m_sprite->setOrigin(sf::Vector2f(bounds.size.x / 2.f, bounds.size.y / 2.f));
     }
-	std::cout << "Sprite : " << m_sprite.has_value() << std::endl;
 }

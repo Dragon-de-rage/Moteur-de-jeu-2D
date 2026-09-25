@@ -19,6 +19,10 @@ void Player::update(float deltaTime)
 	}
 }
 
+void Player::compute_speed() {
+    m_speed = std::sqrt(m_speedX*m_speedX + m_speedY*m_speedY);
+}
+
 //double Player::getPosX() const
 //{
 //	return m_posX;

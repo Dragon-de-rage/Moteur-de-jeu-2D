@@ -46,10 +46,8 @@ public:
     // constantes (plus tard paramétrable dans moteur)
 
     double propulsion = 100000.0;
-    //double coef_frottements = 5.0;
-	double coef_frottements = 0; 
-    //double masse_volumique_atmo = 1.225;
-	double  masse_volumique_atmo = 0.0;
+    double coef_frottements = 5.0;
+    double masse_volumique_atmo = 1.225;
 
     // Player mass (in kilograms)
     double mass = 1000.0;
@@ -59,11 +57,12 @@ public:
     double radius = 10;
 
 	//zoom factor
-	double zoom_factor = 1.0;
+    double zoom_factor = 1.0;
 
 private:
 
     double current_dt = 0.0;
+    sf::Vector2u screen_res;
 
     sf::RenderWindow _window;
 
@@ -80,6 +79,9 @@ private:
     double get_forcesY();
     double compute_friction(double speed);
 	double compute_delta_t();
+
+    void compute_border_collision();
+    void render_debug();
 
     void update();
 };
