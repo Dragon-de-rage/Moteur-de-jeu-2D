@@ -35,17 +35,17 @@ WorldPoint toWorld(const ScreenPoint& point, int W, int H, double z)
 // the sum of all vectorial absolute forces
 // absolute = not relative to speed or anything
 double GameWindow::get_forcesX() {
-    return gravity[0]*mass;
+    return gravity[0]*player->mass;
 }
 double GameWindow::get_forcesY() {
-    return gravity[1]*mass;
+    return gravity[1]*player->mass;
 }
 
 // on néglige l'aire du solide selon la direction perpendiculaire à la vitesse S
 // le coeff. de frottements est ici utilisé comme le coeff. de traînée
-double GameWindow::compute_friction(double speed) {
-    return (speed * speed * masse_volumique_atmo * coef_frottements) / 2;
-}
+// double GameWindow::compute_friction(double speed) {
+//     return (speed * speed * masse_volumique_atmo * coef_frottements) / 2;
+// }
 
 double GameWindow::compute_delta_t()
 {
@@ -57,55 +57,6 @@ double GameWindow::compute_delta_t()
     last_frame_time = now;
 
     return delta_t.count();
-}
-
-void GameWindow::compute_border_collision()
-{
-    //calculate the limits of the player's position based on the screen size and zoom factor
-    double xMax = (screen_res.x / 2.0) / zoom_factor - radius;
-    double xMin = -xMax;
-
-    double yMax = (screen_res.y / 2.0) / zoom_factor - radius;
-    double yMin = -yMax;
-
-    //check if the player is out of bounds and adjust position and speed accordingly
-    if (player->m_posX > xMax) {
-        double oldX = player->m_posX - player->m_speedX * current_dt;
-        double timeToCollision = (xMax - oldX) / player->m_speedX;
-        double remainingTime = current_dt - timeToCollision;
-
-        player->m_speedX = -player->m_speedX;
-
-        player->m_posX = xMax + (player->m_speedX * remainingTime);
-    }
-    else if (player->m_posX < xMin) {
-        double oldX = player->m_posX - player->m_speedX * current_dt;
-        double timeToCollision = (xMin - oldX) / player->m_speedX;
-        double remainingTime = current_dt - timeToCollision;
-
-        player->m_speedX = -player->m_speedX;
-
-        player->m_posX = xMin + (player->m_speedX * remainingTime);
-    }
-
-    if (player->m_posY > yMax) {
-        double oldY = player->m_posY - player->m_speedY * current_dt;
-        double timeToCollision = (yMax - oldY) / player->m_speedY;
-        double remainingTime = current_dt - timeToCollision;
-
-        player->m_speedY = -player->m_speedY;
-
-        player->m_posY= player->m_posY + (player->m_speedY * remainingTime);
-    }
-    else if (player->m_posY < yMin) {
-        double oldY = player->m_posY - player->m_speedY * current_dt;
-        double timeToCollision = (yMin - oldY) / player->m_speedY;
-        double remainingTime = current_dt - timeToCollision;
-
-        player->m_speedY = -player->m_speedY;
-
-        player->m_posY = player->m_posY + (player->m_speedY * remainingTime);
-    }
 }
 
 void GameWindow::render_debug()
@@ -133,8 +84,8 @@ void GameWindow::render_debug()
         _window.draw(graduation);
     }
 
-    double deltaX = player->m_posX - playerbeforeX;
-    double deltaY = player->m_posY - playerbeforeY;
+    double deltaX = player->get_pos_X() - player->get_player_before_X();
+    double deltaY = player->get_pos_Y() - player->get_player_before_Y();
 
     double distance = std::sqrt(deltaX * deltaX + deltaY * deltaY);
     double vitesse = distance / current_dt; // speed = distance / time
@@ -142,10 +93,10 @@ void GameWindow::render_debug()
     static sf::Font font;
     static bool fontLoaded = font.openFromFile("arial.ttf");
 
-    double v = std::sqrt(player->m_speedX * player->m_speedX + player->m_speedY * player->m_speedY);
+    double v = player->compute_and_get_speed();
     double g = gravity[1];
-    double energieCinetique = 0.5 * mass * v * v;
-    double energiePotentielle = mass * g * -player->m_posY;
+    double energieCinetique = 0.5 * player->mass * v * v;
+    double energiePotentielle = player->mass * g * -player->get_pos_Y();
     double energieTotale = energieCinetique + energiePotentielle;
 
     if (fontLoaded) {
@@ -253,7 +204,7 @@ void GameWindow::render()
     //zoom factor
     double z = 1.0; // Adjust this value to change the zoom level
     //player position in screen coordinates
-    WorldPoint playerPosition = { player->m_posX, player->m_posY };
+    WorldPoint playerPosition = { player->get_pos_X(), player->get_pos_Y() };
 
     // Convert player position to screen coordinates
     ScreenPoint playerScreenPosition = toScreen(playerPosition, screen_res.x, screen_res.y, zoom_factor);
@@ -288,52 +239,5 @@ void GameWindow::render()
 
 void GameWindow::update()
 {
-	playerbeforeX = player->m_posX;
-    playerbeforeY = player->m_posY;
-
-    //Ff,x​= −kvvx ; Ff,y​= −kvvy
-    player->compute_speed();
-    // double friction = compute_friction(player_speed);
-    double frictionX = -(coef_frottements * player->m_speed * player->m_speedX * masse_volumique_atmo)/2;
-    double frictionY = -(coef_frottements * player->m_speed * player->m_speedY * masse_volumique_atmo)/2;
-
-    // if a key is pressed, we add propulsion
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
-    {
-        player->m_speedX -= (propulsion/mass) * current_dt;
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
-    {
-        player->m_speedX += (propulsion/mass) * current_dt;
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
-    {
-        player->m_speedY -= (propulsion/mass) * current_dt;
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
-    {
-        player->m_speedY += (propulsion/mass) * current_dt;
-    }
-
-    // whether or not a key is pressed, we compute new speed without propulsion
-    player->m_speedX += ((get_forcesX() + frictionX)/ mass) * current_dt;
-    player->m_speedY += ((get_forcesY() + frictionY)/ mass) * current_dt;
-
-    player->m_posX += player->m_speedX * current_dt;
-    player->m_posY += player->m_speedY * current_dt;
-
-    compute_border_collision();
-
-    // used by render() to rotate the sprite
-    double deltaX = player->m_posX - playerbeforeX;
-    double deltaY = player->m_posY - playerbeforeY;
-    double moveDistance = std::sqrt(deltaX * deltaX + deltaY * deltaY);
-
-    const double MOVE_THRESHOLD = 0.001;
-
-    if (moveDistance > MOVE_THRESHOLD)
-    {
-        constexpr double PI = 3.14159265358979323846;
-        player->m_angle = static_cast<float>(std::atan2(deltaY, deltaX) * 180.0 / PI);
-    }
+    player->compute_movement(coef_frottements, masse_volumique_atmo, current_dt, get_forcesX(), get_forcesY(), zoom_factor, screen_res);
 }

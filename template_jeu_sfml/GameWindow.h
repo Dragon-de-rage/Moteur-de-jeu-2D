@@ -32,8 +32,6 @@ public:
     //  * Nothing.
 
     // position joueur
-	double playerbeforeX = 0.0;
-	double playerbeforeY = 0.0;
 
     time_point last_frame_time = std::chrono::high_resolution_clock::now();
 
@@ -45,16 +43,8 @@ public:
     std::array<double, 2> gravity = {0.0, 9.80665};
     // constantes (plus tard paramétrable dans moteur)
 
-    double propulsion = 100000.0;
     double coef_frottements = 5.0;
     double masse_volumique_atmo = 1.225;
-
-    // Player mass (in kilograms)
-    double mass = 1000.0;
-
-
-	// player radius (in pixels)
-    double radius = 10;
 
 	//zoom factor
     double zoom_factor = 1.0;
@@ -77,7 +67,7 @@ private:
 
     double get_forcesX();
     double get_forcesY();
-    double compute_friction(double speed);
+    // double compute_friction(double speed);
 	double compute_delta_t();
 
     void compute_border_collision();
