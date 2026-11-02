@@ -23,6 +23,7 @@ public:
 
 	// Set each keys
 	void setKey(PlayerAction action, sf::Keyboard::Key key);
+	void setPlayerKeys(const std::vector<sf::Keyboard::Key>& keys) { playerKeys = keys; }
 
 	/*double getPosX() const;
     double getPosY() const;*/
@@ -40,6 +41,8 @@ public:
     // double get_speed_Y();
     double compute_and_get_speed();
 
+	std::vector<sf::Keyboard::Key> getPlayerKeys() const { return playerKeys; }
+
 private:
 	bool isKeyPressed(PlayerAction action);
 
@@ -55,6 +58,8 @@ private:
     double propulsion = 100000.0;
 
 	KeyBinding m_keyBinding;
+
+    std::vector<sf::Keyboard::Key> playerKeys = { sf::Keyboard::Key::Up, sf::Keyboard::Key::Down, sf::Keyboard::Key::Left, sf::Keyboard::Key::Right };
 };
 
 #endif // !PLAYER_H

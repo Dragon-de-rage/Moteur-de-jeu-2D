@@ -3,7 +3,7 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <unordered_map>
 
-enum class PlayerAction
+enum PlayerAction
 {
 	MoveUp,
 	MoveDown,

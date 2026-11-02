@@ -36,19 +36,19 @@ void Player::compute_movement(double& coef_frottements, double& masse_volumique_
     double frictionY = -(coef_frottements * m_speed * m_speedY * masse_volumique_atmo)/2;
 
     // if a key is pressed, we add propulsion
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
+    if (sf::Keyboard::isKeyPressed(playerKeys[PlayerAction::MoveLeft]))
     {
         m_speedX -= (propulsion/mass) * current_dt;
     }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
+    if (sf::Keyboard::isKeyPressed(playerKeys[PlayerAction::MoveRight]))
     {
         m_speedX += (propulsion/mass) * current_dt;
     }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
+    if (sf::Keyboard::isKeyPressed(playerKeys[PlayerAction::MoveUp]))
     {
         m_speedY -= (propulsion/mass) * current_dt;
     }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
+    if (sf::Keyboard::isKeyPressed(playerKeys[PlayerAction::MoveDown]))
     {
         m_speedY += (propulsion/mass) * current_dt;
     }
