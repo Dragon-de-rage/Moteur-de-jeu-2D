@@ -14,6 +14,30 @@ GameWindow::GameWindow()
 	else {
 		std::cout << "Erreur lors du chargement de l'image de fond : " << backgroundImagePath << std::endl;
     }
+
+    // Lapin : saute horizontalement en aller-retour
+    decorations.push_back(std::make_unique<Decoration>(Decoration::Config{
+        .textureFile = "Images/doodle_bunny_cute_animal_rabbit_icon_251451.png",
+        .start = { 100.f, 520.f },
+        .end = { 700.f, 520.f },
+        .speed = 120.f,
+        .scale = 0.1f,
+		.facesLeft = true,          // the bunny faces left by default
+        .hopHeight = 40.f,
+        .hopFrequency = 1.5f
+        }));
+
+    // Papillon : diagonale en aller-retour, avec battement d'ailes
+    decorations.push_back(std::make_unique<Decoration>(Decoration::Config{
+        .textureFile = "Images/22258bat_98816.png",
+        .start = { 100.f, 450.f },
+        .end = { 650.f, 100.f },
+        .speed = 90.f,
+        .scale = 0.1f,
+        .flipWithDirection = false, // the bat is assymetrical
+        .flapAmplitude = 0.6f,
+        .flapFrequency = 6.f
+        }));
 }
 
 ScreenPoint toScreen(const WorldPoint& point, int W, int H, double z)
@@ -195,6 +219,11 @@ void GameWindow::render()
             screen_res.y / backgroundSprite->getLocalBounds().size.y));
         _window.draw(*backgroundSprite);
     }
+
+    for (const auto& d : decorations)
+        d->draw(_window);
+
+
 #ifdef SFML_DEBUG // if in debug, prints the axis
     render_debug();
 #endif
@@ -239,5 +268,9 @@ void GameWindow::render()
 
 void GameWindow::update()
 {
+    for (auto& d : decorations)
+        d->update(static_cast<float>(current_dt));
+
     player->compute_movement(coef_frottements, masse_volumique_atmo, current_dt, get_forcesX(), get_forcesY(), zoom_factor, screen_res);
 }
+

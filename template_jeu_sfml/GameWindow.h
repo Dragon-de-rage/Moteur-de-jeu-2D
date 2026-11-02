@@ -7,8 +7,11 @@
 #include <chrono>
 #include <array>
 #include <optional>
+#include <memory>
+#include <vector>
 #include "Entity.h"
 #include "Player.h"
+#include "Decoration.h"
 
 using ScreenPoint = std::pair<int, int>;
 using WorldPoint = std::pair<double, double>;
@@ -74,6 +77,8 @@ private:
     void render_debug();
 
     void update();
+
+    std::vector<std::unique_ptr<Decoration>> decorations;
 };
 
 #endif
