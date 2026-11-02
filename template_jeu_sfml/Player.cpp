@@ -1,8 +1,11 @@
 #include "Player.h"
 
 Player::Player(double x, double y)
-	: m_posX(x), m_posY(y), m_angle(0.0), m_speedX(0.0), m_speedY(0.0)
+    : m_speedX(0.0), m_speedY(0.0)
 {
+    m_posX = x;
+    m_posY = y;
+    m_angle = 0.0;
 	m_textureFile = "Images/animal_linux_penguin_2598.png";
 	setTexture();
 }
@@ -122,16 +125,6 @@ void Player::compute_border_collision(const sf::Vector2u& screen_res, double zoo
 
         m_posY = m_posY + (m_speedY * remainingTime);
     }
-}
-
-double Player::get_pos_X()
-{
-    return m_posX;
-}
-
-double Player::get_pos_Y()
-{
-    return m_posY;
 }
 
 double Player::get_player_before_X()

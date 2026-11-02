@@ -20,6 +20,14 @@ public:
 protected:
 	std::string m_textureFile;
 	sf::Texture m_texture;
+    double m_posX;
+    double m_posY;
+    double m_angle;
+
+public :
+    double get_pos_X();
+    double get_pos_Y();
+    double get_angle();
 };
 
 #endif

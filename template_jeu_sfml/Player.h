@@ -16,8 +16,6 @@ public:
 
     double mass = 1000.0;
 
-	double m_angle;
-
 	// Set each player's key binding
 	void setKeyBinding(const KeyBinding& binding);
 
@@ -33,8 +31,6 @@ public:
     void compute_border_collision(const sf::Vector2u& screen_res, double zoom_factor, double current_dt);
 
     // getters
-    double get_pos_X();
-    double get_pos_Y();
     double get_player_before_X();
     double get_player_before_Y();
     // double get_speed_X();
@@ -46,8 +42,6 @@ public:
 private:
 	bool isKeyPressed(PlayerAction action);
 
-    double m_posX;
-    double m_posY;
     double m_speed; // norme de la vitesse
     double m_speedX;
     double m_speedY;

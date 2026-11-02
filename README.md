@@ -75,3 +75,4 @@ Audrey JULIEN
 ## Crédits
 
 *Freebsd demon*, *Animal firefox fox*, *Animal thebat bat e*, *Animal Adium*, *Animal monkey monkeys audio*, *Animal elephant* et *Animal linux penguin Evernote* icones par TurboMilk sur <a href="https://icon-icons.com/authors/21-turbomilk">Icon-Icons.com</a>
+Asteroid Icon by Good stuff non sense on <a href="https://icon-icons.com/authors/552-good-stuff-non-sense">Icon-Icons.com</a>
