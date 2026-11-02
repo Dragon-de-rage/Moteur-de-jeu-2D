@@ -9,11 +9,13 @@ class Entity
 {
 public:
 	// Update physics and logic
-	virtual void update(float deltaTime) = 0;
+    virtual void update(float deltaTime) = 0;
 
-	void setTexture();
+    virtual void draw(std::pair<int, int> screenPoint, sf::RenderWindow* window);
 
-	[[nodiscard]] bool isColliding(const Entity& other) const;
+    void setTexture(sf::Vector2f scale);
+
+    [[nodiscard]] bool isColliding(const Entity& other) const;
 
 	std::optional<sf::Sprite> m_sprite;
 
@@ -23,11 +25,13 @@ protected:
     double m_posX;
     double m_posY;
     double m_angle;
+    int radius = 10;
 
 public :
     double get_pos_X();
     double get_pos_Y();
     double get_angle();
+
 };
 
 #endif

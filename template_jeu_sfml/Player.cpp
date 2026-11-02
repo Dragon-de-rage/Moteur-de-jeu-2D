@@ -7,7 +7,7 @@ Player::Player(double x, double y)
     m_posY = y;
     m_angle = 0.0;
 	m_textureFile = "Images/animal_linux_penguin_2598.png";
-	setTexture();
+    setTexture(sf::Vector2f(0.1, 0.1));
 }
 
 void Player::update(float deltaTime)

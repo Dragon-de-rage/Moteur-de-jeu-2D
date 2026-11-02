@@ -12,7 +12,7 @@ class Player : public Entity
 public:
 	Player(double x = 0.0, double y = 0.0);
 
-	void update(float deltaTime) override;
+    void update(float deltaTime) override;
 
     double mass = 1000.0;
 

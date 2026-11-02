@@ -61,6 +61,8 @@ private:
 
 	Player *player = nullptr;
 
+    std::vector<Entity*> entities;
+
     // Texture et sprite utilisés pour afficher le fond fixe
     sf::Texture backgroundTexture;
     std::optional<sf::Sprite> backgroundSprite;

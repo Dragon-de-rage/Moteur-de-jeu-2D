@@ -1,11 +1,15 @@
 #include <GameWindow.h>
 #include <iostream>
 #include <cmath>
+#include "Asteroid.h"
 
 GameWindow::GameWindow()
 {
     //!\\ Instancier le joueur
 	player = new Player(0.0, 0.0);
+
+    // creation des entités autres
+    entities.push_back(new Asteroid(100.0, 100.0));
 
 	std::string backgroundImagePath = "Images/space-background.jpg";
 	if (backgroundTexture.loadFromFile(backgroundImagePath)) {
@@ -39,6 +43,7 @@ GameWindow::GameWindow()
         .flapFrequency = 6.f
         }));
 
+    // Asteroid* asteroid1 = new Asteroid(10.0, 10.0);
 }
 
 ScreenPoint toScreen(const WorldPoint& point, int W, int H, double z)
@@ -239,30 +244,35 @@ void GameWindow::render()
     // Convert player position to screen coordinates
     ScreenPoint playerScreenPosition = toScreen(playerPosition, screen_res.x, screen_res.y, zoom_factor);
 
-
-    if (player->m_sprite)
-    {
-
-        // to adjust according to the base rotation we want (90 = UP)
-        constexpr float ROTATION_OFFSET = 90.f;
-
-        player->m_sprite->setRotation(sf::degrees(player->get_angle() + ROTATION_OFFSET));
-
-        player->m_sprite->setPosition(sf::Vector2f(playerScreenPosition.first, playerScreenPosition.second));
-
-        _window.draw(*player->m_sprite);
+    player->draw(playerScreenPosition, &_window);
+    for (auto entity : entities) {
+        WorldPoint entityPosition = { entity->get_pos_X(), entity->get_pos_Y() };
+        ScreenPoint entityScreenPosition = toScreen(entityPosition, screen_res.x, screen_res.y, zoom_factor);
+        entity->draw(entityScreenPosition, &_window);
     }
-    else
-    {
-        //create player circle shape
-        sf::CircleShape circle(radius);
 
-        circle.setFillColor(sf::Color::Yellow);
+    // if (player->m_sprite)
+    // {
+    //     // to adjust according to the base rotation we want (90 = UP)
+    //     constexpr float ROTATION_OFFSET = 90.f;
 
-        circle.setPosition(sf::Vector2f(playerScreenPosition.first - radius, playerScreenPosition.second - radius));
+    //     player->m_sprite->setRotation(sf::degrees(player->get_angle() + ROTATION_OFFSET));
 
-        _window.draw(circle);
-    }
+    //     player->m_sprite->setPosition(sf::Vector2f(playerScreenPosition.first, playerScreenPosition.second));
+
+    //     _window.draw(*player->m_sprite);
+    // }
+    // else
+    // {
+    //     //create player circle shape
+    //     sf::CircleShape circle(radius);
+
+    //     circle.setFillColor(sf::Color::Yellow);
+
+    //     circle.setPosition(sf::Vector2f(playerScreenPosition.first - radius, playerScreenPosition.second - radius));
+
+    //     _window.draw(circle);
+    // }
 
     _window.display();
 }
