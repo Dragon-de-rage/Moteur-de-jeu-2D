@@ -79,3 +79,6 @@ Audrey JULIEN
 *Bat* icone par Google sur <a href="https://icon-icons.com/icon/bat/98816">Icon-Icons.com</a>
 
 *Doodle bunny cute animal* icone par Dooder sur <a href="https://icon-icons.com/icon/doodle-bunny-cute-animal-rabbit/251451">Icon-Icons.com</a>
+
+Asteroid Icon by Good stuff non sense on <a href="https://icon-icons.com/authors/552-good-stuff-non-sense">Icon-Icons.com</a>
+

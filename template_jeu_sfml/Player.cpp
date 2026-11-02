@@ -1,8 +1,11 @@
 #include "Player.h"
 
 Player::Player(double x, double y)
-	: m_posX(x), m_posY(y), m_angle(0.0), m_speedX(0.0), m_speedY(0.0)
+    : m_speedX(0.0), m_speedY(0.0)
 {
+    m_posX = x;
+    m_posY = y;
+    m_angle = 0.0;
 	m_textureFile = "Images/animal_linux_penguin_2598.png";
 	setTexture();
 }
@@ -36,19 +39,19 @@ void Player::compute_movement(double& coef_frottements, double& masse_volumique_
     double frictionY = -(coef_frottements * m_speed * m_speedY * masse_volumique_atmo)/2;
 
     // if a key is pressed, we add propulsion
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
+    if (sf::Keyboard::isKeyPressed(playerKeys[PlayerAction::MoveLeft]))
     {
         m_speedX -= (propulsion/mass) * current_dt;
     }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
+    if (sf::Keyboard::isKeyPressed(playerKeys[PlayerAction::MoveRight]))
     {
         m_speedX += (propulsion/mass) * current_dt;
     }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
+    if (sf::Keyboard::isKeyPressed(playerKeys[PlayerAction::MoveUp]))
     {
         m_speedY -= (propulsion/mass) * current_dt;
     }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
+    if (sf::Keyboard::isKeyPressed(playerKeys[PlayerAction::MoveDown]))
     {
         m_speedY += (propulsion/mass) * current_dt;
     }
@@ -122,16 +125,6 @@ void Player::compute_border_collision(const sf::Vector2u& screen_res, double zoo
 
         m_posY = m_posY + (m_speedY * remainingTime);
     }
-}
-
-double Player::get_pos_X()
-{
-    return m_posX;
-}
-
-double Player::get_pos_Y()
-{
-    return m_posY;
 }
 
 double Player::get_player_before_X()

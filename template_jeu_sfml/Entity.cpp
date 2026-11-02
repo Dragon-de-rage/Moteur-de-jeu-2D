@@ -10,3 +10,18 @@ void Entity::setTexture()
         m_sprite->setOrigin(sf::Vector2f(bounds.size.x / 2.f, bounds.size.y / 2.f));
     }
 }
+
+double Entity::get_pos_X()
+{
+    return m_posX;
+}
+
+double Entity::get_pos_Y()
+{
+    return m_posY;
+}
+
+double Entity::get_angle()
+{
+    return m_angle;
+}

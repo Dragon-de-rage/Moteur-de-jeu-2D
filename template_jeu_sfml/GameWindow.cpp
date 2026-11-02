@@ -38,6 +38,7 @@ GameWindow::GameWindow()
         .flapAmplitude = 0.6f,
         .flapFrequency = 6.f
         }));
+
 }
 
 ScreenPoint toScreen(const WorldPoint& point, int W, int H, double z)
@@ -245,7 +246,7 @@ void GameWindow::render()
         // to adjust according to the base rotation we want (90 = UP)
         constexpr float ROTATION_OFFSET = 90.f;
 
-        player->m_sprite->setRotation(sf::degrees(player->m_angle + ROTATION_OFFSET));
+        player->m_sprite->setRotation(sf::degrees(player->get_angle() + ROTATION_OFFSET));
 
         player->m_sprite->setPosition(sf::Vector2f(playerScreenPosition.first, playerScreenPosition.second));
 

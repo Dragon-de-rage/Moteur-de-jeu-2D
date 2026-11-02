@@ -16,13 +16,12 @@ public:
 
     double mass = 1000.0;
 
-	double m_angle;
-
 	// Set each player's key binding
 	void setKeyBinding(const KeyBinding& binding);
 
 	// Set each keys
 	void setKey(PlayerAction action, sf::Keyboard::Key key);
+	void setPlayerKeys(const std::vector<sf::Keyboard::Key>& keys) { playerKeys = keys; }
 
 	/*double getPosX() const;
     double getPosY() const;*/
@@ -32,19 +31,17 @@ public:
     void compute_border_collision(const sf::Vector2u& screen_res, double zoom_factor, double current_dt);
 
     // getters
-    double get_pos_X();
-    double get_pos_Y();
     double get_player_before_X();
     double get_player_before_Y();
     // double get_speed_X();
     // double get_speed_Y();
     double compute_and_get_speed();
 
+	std::vector<sf::Keyboard::Key> getPlayerKeys() const { return playerKeys; }
+
 private:
 	bool isKeyPressed(PlayerAction action);
 
-    double m_posX;
-    double m_posY;
     double m_speed; // norme de la vitesse
     double m_speedX;
     double m_speedY;
@@ -55,6 +52,8 @@ private:
     double propulsion = 100000.0;
 
 	KeyBinding m_keyBinding;
+
+    std::vector<sf::Keyboard::Key> playerKeys = { sf::Keyboard::Key::Up, sf::Keyboard::Key::Down, sf::Keyboard::Key::Left, sf::Keyboard::Key::Right };
 };
 
 #endif // !PLAYER_H
