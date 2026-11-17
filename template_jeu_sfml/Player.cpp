@@ -1,12 +1,12 @@
 #include "Player.h"
 
-Player::Player(double x, double y)
+Player::Player(double x, double y, std::string texturePath)
     : m_speedX(0.0), m_speedY(0.0)
 {
     m_posX = x;
     m_posY = y;
     m_angle = 0.0;
-	m_textureFile = "Images/animal_linux_penguin_2598.png";
+	m_textureFile = texturePath;
     setTexture(sf::Vector2f(0.1, 0.1));
 }
 

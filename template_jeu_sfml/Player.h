@@ -10,7 +10,7 @@
 class Player : public Entity
 {
 public:
-	Player(double x = 0.0, double y = 0.0);
+	Player(double x = 0.0, double y = 0.0, std::string texturePath = "");
 
     void update(float deltaTime) override;
 

@@ -6,7 +6,14 @@
 GameWindow::GameWindow()
 {
     //!\\ Instancier le joueur
-	player = new Player(0.0, 0.0);
+	players.push_back(new Player(0.0, 0.0, "Images/animal_linux_penguin_2598.png"));
+	players.push_back(new Player(100.0, 100.0, "Images/animal_firefox_fox_2593.png"));
+
+	std::vector<sf::Keyboard::Key> player1Keys = { sf::Keyboard::Key::Z, sf::Keyboard::Key::S, sf::Keyboard::Key::Q, sf::Keyboard::Key::D };
+	std::vector<sf::Keyboard::Key> player2Keys = { sf::Keyboard::Key::Up, sf::Keyboard::Key::Down, sf::Keyboard::Key::Left, sf::Keyboard::Key::Right };
+
+	players[0]->setPlayerKeys(player1Keys);
+	players[1]->setPlayerKeys(player2Keys);
 
     // creation des entités autres
     entities.push_back(new Asteroid(100.0, 100.0));
@@ -64,10 +71,10 @@ WorldPoint toWorld(const ScreenPoint& point, int W, int H, double z)
 
 // the sum of all vectorial absolute forces
 // absolute = not relative to speed or anything
-double GameWindow::get_forcesX() {
+double GameWindow::get_forces_playerX(Player* player) {
     return gravity[0]*player->mass;
 }
-double GameWindow::get_forcesY() {
+double GameWindow::get_forces_playerY(Player* player) {
     return gravity[1]*player->mass;
 }
 
@@ -114,8 +121,9 @@ void GameWindow::render_debug()
         _window.draw(graduation);
     }
 
-    double deltaX = player->get_pos_X() - player->get_player_before_X();
-    double deltaY = player->get_pos_Y() - player->get_player_before_Y();
+	// Debug : print speed and energy of the first player
+    double deltaX = players[0]->get_pos_X() - players[0]->get_player_before_X();
+    double deltaY = players[0]->get_pos_Y() - players[0]->get_player_before_Y();
 
     double distance = std::sqrt(deltaX * deltaX + deltaY * deltaY);
     double vitesse = distance / current_dt; // speed = distance / time
@@ -123,10 +131,10 @@ void GameWindow::render_debug()
     static sf::Font font;
     static bool fontLoaded = font.openFromFile("arial.ttf");
 
-    double v = player->compute_and_get_speed();
+    double v = players[0]->compute_and_get_speed();
     double g = gravity[1];
-    double energieCinetique = 0.5 * player->mass * v * v;
-    double energiePotentielle = player->mass * g * -player->get_pos_Y();
+    double energieCinetique = 0.5 * players[0]->mass * v * v;
+    double energiePotentielle = players[0]->mass * g * -players[0]->get_pos_Y();
     double energieTotale = energieCinetique + energiePotentielle;
 
     if (fontLoaded) {
@@ -165,6 +173,7 @@ void GameWindow::render_debug()
         std::cout << "Energie Potentielle : " << energiePotentielle << " MJ" << std::endl;
         std::cout << "Energie Totale : " << energieTotale << " MJ" << std::endl;
     } // Print in console if font is not loaded
+    
 }
 
 void GameWindow::show(int width, int height, const std::string& title)
@@ -238,17 +247,20 @@ void GameWindow::render()
 
     //zoom factor
     double z = 1.0; // Adjust this value to change the zoom level
-    //player position in screen coordinates
-    WorldPoint playerPosition = { player->get_pos_X(), player->get_pos_Y() };
+    
+    for (const auto& player : players) {
+        //player position in screen coordinates
+        WorldPoint playerPosition = { player->get_pos_X(), player->get_pos_Y() };
 
-    // Convert player position to screen coordinates
-    ScreenPoint playerScreenPosition = toScreen(playerPosition, screen_res.x, screen_res.y, zoom_factor);
+        // Convert player position to screen coordinates
+        ScreenPoint playerScreenPosition = toScreen(playerPosition, screen_res.x, screen_res.y, zoom_factor);
 
-    player->draw(playerScreenPosition, &_window);
-    for (auto entity : entities) {
-        WorldPoint entityPosition = { entity->get_pos_X(), entity->get_pos_Y() };
-        ScreenPoint entityScreenPosition = toScreen(entityPosition, screen_res.x, screen_res.y, zoom_factor);
-        entity->draw(entityScreenPosition, &_window);
+        player->draw(playerScreenPosition, &_window);
+        for (auto entity : entities) {
+            WorldPoint entityPosition = { entity->get_pos_X(), entity->get_pos_Y() };
+            ScreenPoint entityScreenPosition = toScreen(entityPosition, screen_res.x, screen_res.y, zoom_factor);
+            entity->draw(entityScreenPosition, &_window);
+        }
     }
 
     // if (player->m_sprite)
@@ -282,6 +294,7 @@ void GameWindow::update()
     for (auto& d : decorations)
         d->update(static_cast<float>(current_dt));
 
-    player->compute_movement(coef_frottements, masse_volumique_atmo, current_dt, get_forcesX(), get_forcesY(), zoom_factor, screen_res);
+	for (auto player : players)
+		player->compute_movement(coef_frottements, masse_volumique_atmo, current_dt, get_forces_playerX(player), get_forces_playerY(player), zoom_factor, screen_res);
 }
 

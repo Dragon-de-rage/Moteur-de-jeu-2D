@@ -106,3 +106,12 @@ J'ai également mis à jour le fichier *CMakeList* afin qu'il incluse *Entity* e
 ## Cours du 02/11/26
 
 J'ai fini d'implémenter les contrôles modulables des joueurs ainsi que le fait de pouvoir créer plusieurs joueur dans la même fenêtre de jeu.
+
+## Cours du 17/11/26
+
+J'ai testé de mettre deux joueurs avec différente touches dans le même fenêtre de jeu en changant du coup le fonctionnement de `GameWindow` pour pouvoir aceuillir les deux joueur en même temps
+
+Questions du sujet : 
+
+**6.4 Ennemi suivant le joueur**
+

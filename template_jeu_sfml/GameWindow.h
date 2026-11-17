@@ -59,7 +59,7 @@ private:
 
     sf::RenderWindow _window;
 
-	Player *player = nullptr;
+	std::vector<Player*> players;
 
     std::vector<Entity*> entities;
 
@@ -70,8 +70,8 @@ private:
     void processEvents();
     void render();
 
-    double get_forcesX();
-    double get_forcesY();
+    double get_forces_playerX(Player* player);
+    double get_forces_playerY(Player* player);
     // double compute_friction(double speed);
 	double compute_delta_t();
 
