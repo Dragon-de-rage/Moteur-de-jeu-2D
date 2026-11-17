@@ -102,3 +102,7 @@ Débugage de la refactorisation, j'ai eu les mêmes problème que la séance der
 J'ai encore travaillé sur l'intégration de *Entity* et *Player* dans le code existant. J'ai commencé à travailler sur l'intégration des touches réglable (pour les déplacements d'un ou plusieurs joueurs).
 
 J'ai également mis à jour le fichier *CMakeList* afin qu'il incluse *Entity* et *Player* afin qu'ils soient pris en compte dans la solution.
+
+## Cours du 02/11/26
+
+J'ai fini d'implémenter les contrôles modulables des joueurs ainsi que le fait de pouvoir créer plusieurs joueur dans la même fenêtre de jeu.
