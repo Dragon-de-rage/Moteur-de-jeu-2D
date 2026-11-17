@@ -5,10 +5,10 @@
 
 GameWindow::GameWindow()
 {
-    //!\\ Instancier le joueur
+	//!\\ add a player to the game
 	player = new Player(0.0, 0.0);
 
-    // creation des entités autres
+	//create an asteroid and add it to the entities vector
     entities.push_back(new Asteroid(100.0, 100.0));
 
 	std::string backgroundImagePath = "Images/space-background.jpg";
@@ -19,7 +19,7 @@ GameWindow::GameWindow()
 		std::cout << "Erreur lors du chargement de l'image de fond : " << backgroundImagePath << std::endl;
     }
 
-    // Chargement du shader
+	// check if shaders are available
     if (sf::Shader::isAvailable()) {
         shaderLoaded = backgroundShader.loadFromFile(
             "filtre.frag",
@@ -34,7 +34,7 @@ GameWindow::GameWindow()
         }
     }
 
-    // Lapin : saute horizontalement en aller-retour
+	// bunny : moving horizontally, hopping
     decorations.push_back(std::make_unique<Decoration>(Decoration::Config{
         .textureFile = "Images/doodle_bunny_cute_animal_rabbit_icon_251451.png",
         .start = { 100.f, 520.f },
@@ -46,7 +46,7 @@ GameWindow::GameWindow()
         .hopFrequency = 1.5f
         }));
 
-    // Chauve-souris : diagonale en aller-retour, avec battement d'ailes
+	// bat : flying in diagonal, flapping wings
     decorations.push_back(std::make_unique<Decoration>(Decoration::Config{
         .textureFile = "Images/22258bat_98816.png",
         .start = { 100.f, 450.f },
@@ -197,37 +197,93 @@ void GameWindow::show(int width, int height, const std::string& title)
     }
 }
 
+//void GameWindow::processEvents()
+//{
+//
+//    while (auto event = _window.pollEvent())
+//    {
+//        if (event->is<sf::Event::Closed>())
+//        {
+//            _window.close();
+//        }
+//        /*
+//        if (event->is<sf::Event::KeyPressed>())
+//        {
+//            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
+//            {
+//                playerX -= 1.0; // Move player left
+//            }
+//            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
+//            {
+//                playerX += 1.0; // Move player right
+//            }
+//            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
+//            {
+//                playerY -= 1.0; // Move player up
+//            }
+//            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
+//            {
+//                playerY += 1.0; // Move player down
+//            }
+//        }*/
+//    }
+//}
+
+
+
 void GameWindow::processEvents()
 {
-
     while (auto event = _window.pollEvent())
     {
         if (event->is<sf::Event::Closed>())
         {
             _window.close();
         }
-        /*
-        if (event->is<sf::Event::KeyPressed>())
+
+        // Touche FIN : mort du joueur
+        if (const auto* key = event->getIf<sf::Event::KeyPressed>())
         {
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
+            if (CurentScene == Scene::Game)
             {
-                playerX -= 1.0; // Move player left
+                if (key->code == sf::Keyboard::Key::End)
+                {
+                    CurentScene = Scene::GameOver;
+                }
             }
-            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
+        }
+
+        // Clic sur les boutons
+        if (const auto* mouse = event->getIf<sf::Event::MouseButtonPressed>())
+        {
+            if (mouse->button == sf::Mouse::Button::Left)
             {
-                playerX += 1.0; // Move player right
+                float x = static_cast<float>(mouse->position.x);
+                float y = static_cast<float>(mouse->position.y);
+
+                float centreX = screen_res.x / 2.f;
+                float centreY = screen_res.y / 2.f;
+
+                // Zone du bouton central
+                if (x >= centreX - 100.f && x <= centreX + 100.f)
+                {
+                    if (y >= centreY - 30.f && y <= centreY + 30.f)
+                    {
+                        if (CurentScene == Scene::Menu)
+                        {
+                            CurentScene = Scene::Game;
+                        }
+                        else if (CurentScene == Scene::GameOver)
+                        {
+                            CurentScene = Scene::Menu;
+                        }
+                    }
+                }
             }
-            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
-            {
-                playerY -= 1.0; // Move player up
-            }
-            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
-            {
-                playerY += 1.0; // Move player down
-            }
-        }*/
+        }
     }
 }
+
+
 
 void GameWindow::render()
 {
@@ -268,8 +324,116 @@ void GameWindow::render()
         }
     }
 
+    
+
+    // SCENE 1 : MENU
+    if (CurentScene == Scene::Menu)
+    {
+        sf::RectangleShape bouton(sf::Vector2f(200.f, 60.f));
+        bouton.setOrigin(sf::Vector2f(100.f, 30.f));
+        bouton.setPosition(sf::Vector2f(
+            screen_res.x / 2.f,
+            screen_res.y / 2.f
+        ));
+        bouton.setFillColor(sf::Color::Blue);
+
+        _window.draw(bouton);
+
+        static sf::Font font;
+        static bool fontLoaded = font.openFromFile("arial.ttf");
+
+        if (fontLoaded)
+        {
+            sf::Text texte(font);
+            texte.setString("PLAY");
+            texte.setCharacterSize(30);
+            texte.setFillColor(sf::Color::White);
+
+            sf::FloatRect bounds = texte.getLocalBounds();
+
+            texte.setOrigin(sf::Vector2f(
+                bounds.position.x + bounds.size.x / 2.f,
+                bounds.position.y + bounds.size.y / 2.f
+            ));
+
+            texte.setPosition(sf::Vector2f(
+                screen_res.x / 2.f,
+                screen_res.y / 2.f
+            ));
+
+            _window.draw(texte);
+        }
+
+        _window.display();
+        return;
+    }
+
+    // SCENE 3 : GAME OVER
+    if (CurentScene == Scene::GameOver)
+    {
+        static sf::Font font;
+        static bool fontLoaded = font.openFromFile("arial.ttf");
+
+        if (fontLoaded)
+        {
+            // Title GAME OVER
+            sf::Text title(font);
+            title.setString("GAME OVER");
+            title.setCharacterSize(60);
+            title.setFillColor(sf::Color::Red);
+
+            sf::FloatRect bounds = title.getLocalBounds();
+
+            title.setOrigin(sf::Vector2f(
+                bounds.position.x + bounds.size.x / 2.f,
+                bounds.position.y + bounds.size.y / 2.f
+            ));
+
+            title.setPosition(sf::Vector2f(
+                screen_res.x / 2.f,
+                screen_res.y / 2.f - 100.f
+            ));
+
+            _window.draw(title);
+
+            // Bouton MENU
+            sf::RectangleShape bouton(sf::Vector2f(200.f, 60.f));
+            bouton.setOrigin(sf::Vector2f(100.f, 30.f));
+            bouton.setPosition(sf::Vector2f(
+                screen_res.x / 2.f,
+                screen_res.y / 2.f
+            ));
+            bouton.setFillColor(sf::Color::Blue);
+
+            _window.draw(bouton);
+
+            sf::Text texte(font);
+            texte.setString("MENU");
+            texte.setCharacterSize(30);
+            texte.setFillColor(sf::Color::White);
+
+            sf::FloatRect boundsTexte = texte.getLocalBounds();
+
+            texte.setOrigin(sf::Vector2f(
+                boundsTexte.position.x + boundsTexte.size.x / 2.f,
+                boundsTexte.position.y + boundsTexte.size.y / 2.f
+            ));
+
+            texte.setPosition(sf::Vector2f(
+                screen_res.x / 2.f,
+                screen_res.y / 2.f
+            ));
+
+            _window.draw(texte);
+        }
+
+        _window.display();
+        return;
+    }
+
     for (const auto& d : decorations)
         d->draw(_window);
+
 
 
 #ifdef SFML_DEBUG // if in debug, prints the axis
@@ -321,6 +485,11 @@ void GameWindow::render()
 
 void GameWindow::update()
 {
+    if (CurentScene != Scene::Game)
+    {
+        return;
+    }
+
     for (auto& d : decorations)
         d->update(static_cast<float>(current_dt));
 

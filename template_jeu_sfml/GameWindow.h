@@ -89,6 +89,14 @@ private:
     void update();
 
     std::vector<std::unique_ptr<Decoration>> decorations;
+
+    enum class Scene {
+        Menu,
+        Game,
+        GameOver
+    };
+
+    Scene CurentScene = Scene::Menu;
 };
 
 #endif
