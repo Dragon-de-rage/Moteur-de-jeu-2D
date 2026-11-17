@@ -13,6 +13,9 @@
 #include "Player.h"
 #include "Decoration.h"
 
+#include <SFML/Graphics/Shader.hpp>
+#include <SFML/System/Clock.hpp>
+
 using ScreenPoint = std::pair<int, int>;
 using WorldPoint = std::pair<double, double>;
 
@@ -52,6 +55,11 @@ public:
 	//zoom factor
     double zoom_factor = 1.0;
 
+	//fot the background shader
+    sf::Shader backgroundShader;
+    sf::Clock shaderClock;
+    bool shaderLoaded = false;
+
 private:
 
     double current_dt = 0.0;
@@ -81,6 +89,14 @@ private:
     void update();
 
     std::vector<std::unique_ptr<Decoration>> decorations;
+
+    enum class Scene {
+        Menu,
+        Game,
+        GameOver
+    };
+
+    Scene CurentScene = Scene::Menu;
 };
 
 #endif
