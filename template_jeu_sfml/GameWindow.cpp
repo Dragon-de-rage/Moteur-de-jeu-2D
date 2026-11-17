@@ -19,6 +19,21 @@ GameWindow::GameWindow()
 		std::cout << "Erreur lors du chargement de l'image de fond : " << backgroundImagePath << std::endl;
     }
 
+    // Chargement du shader
+    if (sf::Shader::isAvailable()) {
+        shaderLoaded = backgroundShader.loadFromFile(
+            "filtre.frag",
+            sf::Shader::Type::Fragment
+        );
+
+        if (shaderLoaded) {
+            backgroundShader.setUniform(
+                "texture",
+                sf::Shader::CurrentTexture
+            );
+        }
+    }
+
     // Lapin : saute horizontalement en aller-retour
     decorations.push_back(std::make_unique<Decoration>(Decoration::Config{
         .textureFile = "Images/doodle_bunny_cute_animal_rabbit_icon_251451.png",
@@ -31,7 +46,7 @@ GameWindow::GameWindow()
         .hopFrequency = 1.5f
         }));
 
-    // Papillon : diagonale en aller-retour, avec battement d'ailes
+    // Chauve-souris : diagonale en aller-retour, avec battement d'ailes
     decorations.push_back(std::make_unique<Decoration>(Decoration::Config{
         .textureFile = "Images/22258bat_98816.png",
         .start = { 100.f, 450.f },
@@ -220,10 +235,37 @@ void GameWindow::render()
     _window.clear(sf::Color::White);
 
     // Draw background
+    //if (backgroundSprite) {
+    //    backgroundSprite->setScale(sf::Vector2f(screen_res.x / backgroundSprite->getLocalBounds().size.x,
+    //        screen_res.y / backgroundSprite->getLocalBounds().size.y));
+    //    _window.draw(*backgroundSprite);
+    //}
+
+    // Draw background
     if (backgroundSprite) {
-        backgroundSprite->setScale(sf::Vector2f(screen_res.x / backgroundSprite->getLocalBounds().size.x,
-            screen_res.y / backgroundSprite->getLocalBounds().size.y));
-        _window.draw(*backgroundSprite);
+
+        backgroundSprite->setScale(sf::Vector2f(
+            screen_res.x / backgroundSprite->getLocalBounds().size.x,
+            screen_res.y / backgroundSprite->getLocalBounds().size.y
+        ));
+
+        if (shaderLoaded) {
+
+            // Actualiser le temps pour l'animation
+            backgroundShader.setUniform(
+                "time",
+                shaderClock.getElapsedTime().asSeconds()
+            );
+
+            // Appliquer le shader
+            sf::RenderStates states;
+            states.shader = &backgroundShader;
+
+            _window.draw(*backgroundSprite, states);
+        }
+        else {
+            _window.draw(*backgroundSprite);
+        }
     }
 
     for (const auto& d : decorations)
